@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pay Rose | PYUSD Payments</title>
+  <meta name="description" content="Pay with PYUSD using PayPal or Venmo across supported networks." />
+  <style>
+    :root{
+      --bg:#050505;
+      --panel:#0d0d0d;
+      --panel-2:#141414;
+      --line:rgba(255,255,255,.08);
+      --text:#f5f7f5;
+      --muted:#a3aba3;
+      --green:#00c853;
+      --green-2:#00a746;
+      --blue:#0070ba;
+      --venmo:#008cff;
+      --warn:#f0ad29;
+      --danger:#ff6678;
+      --radius:22px;
+      --shadow:0 18px 50px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(0,200,83,.12), transparent 28%),
+        linear-gradient(180deg, #070707 0%, #050505 100%);
+      color:var(--text);
+      line-height:1.55;
+      min-height:100vh;
+    }
+    a{text-decoration:none;color:inherit}
+    button,input,select{font:inherit}
+    .container{width:min(1120px,calc(100% - 24px));margin:auto}
+    .topbar{
+      position:sticky;top:0;z-index:20;
+      backdrop-filter:blur(14px);
+      background:rgba(5,5,5,.78);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    }
+    .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.03em}
+    .logo{
+      width:40px;height:40px;border-radius:14px;
+      display:grid;place-items:center;
+      background:rgba(0,200,83,.12);
+      border:1px solid rgba(0,200,83,.22);
+      color:var(--green);
+      font-weight:900;
+    }
+    .nav-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .ghost-btn,.primary-btn,.secondary-btn,.chip,.network-btn,.copy-btn{
+      border:none;cursor:pointer;transition:.18s ease;
+    }
+    .ghost-btn,.secondary-btn,.copy-btn,.network-btn,.chip{
+      min-height:44px;padding:0 16px;border-radius:999px;
+      background:rgba(255,255,255,.04);color:var(--text);
+      border:1px solid var(--line);
+    }
+    .ghost-btn:hover,.secondary-btn:hover,.copy-btn:hover,.network-btn:hover,.chip:hover{
+      background:rgba(255,255,255,.07);
+    }
+    .primary-btn{
+      min-height:52px;padding:0 18px;border-radius:999px;
+      background:var(--green);color:#031008;font-weight:700;
+      box-shadow:0 14px 32px rgba(0,200,83,.2);
+    }
+    .primary-btn:hover{background:var(--green-2);transform:translateY(-1px)}
+    .hero{padding:56px 0 24px}
+    .hero-grid{
+      display:grid;grid-template-columns:1.1fr .9fr;gap:18px;
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+    }
+    .hero-copy{padding:28px}
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;
+      background:rgba(0,200,83,.1);
+      border:1px solid rgba(0,200,83,.2);
+      color:var(--green);font-size:12px;text-transform:uppercase;letter-spacing:.12em;
+    }
+    h1{
+      font-size:clamp(38px,6vw,72px);
+      line-height:.96;letter-spacing:-.06em;
+      margin-top:18px;max-width:11ch;
+    }
+    .hero-copy p{margin-top:16px;color:var(--muted);max-width:62ch}
+    .hero-actions{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap}
+    .stats{margin-top:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .stat{
+      background:rgba(255,255,255,.03);border:1px solid var(--line);
+      border-radius:18px;padding:14px;
+    }
+    .stat strong{display:block;font-size:20px}
+    .stat span{color:var(--muted);font-size:14px}
+    .hero-side{padding:22px;display:grid;gap:12px}
+    .mini{
+      padding:18px;border-radius:20px;background:rgba(255,255,255,.03);border:1px solid var(--line);
+    }
+    .mini h3{font-size:20px;letter-spacing:-.03em;margin-bottom:6px}
+    .mini p{color:var(--muted);font-size:15px}
+    .main{padding:12px 0 28px}
+    .main-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:18px;align-items:start}
+    .form-card,.invoice-card,.info-card{padding:22px}
+    .section-title{font-size:34px;letter-spacing:-.05em}
+    .section-copy{color:var(--muted);margin-top:8px}
+    .gateway-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}
+    .gateway{
+      padding:16px;border-radius:22px;border:1px solid var(--line);
+      background:rgba(255,255,255,.025);cursor:pointer;
+    }
+    .gateway.active{
+      background:linear-gradient(180deg, rgba(0,200,83,.1), rgba(255,255,255,.03));
+      border-color:rgba(0,200,83,.28);
+      box-shadow:inset 0 0 0 1px rgba(0,200,83,.12);
+    }
+    .gateway-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .gateway-logo{
+      width:48px;height:48px;border-radius:14px;display:grid;place-items:center;
+      color:#fff;font-weight:800;
+    }
+    .paypal-logo{background:linear-gradient(135deg,#003087,#0070ba)}
+    .venmo-logo{background:linear-gradient(135deg,#0a84ff,#1977f3)}
+    .badge{
+      padding:6px 10px;border-radius:999px;font-size:12px;
+      border:1px solid var(--line);color:var(--muted);background:rgba(255,255,255,.04);
+    }
+    .gateway h3{font-size:18px;letter-spacing:-.03em}
+    .gateway p{color:var(--muted);font-size:14px;margin-top:4px}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}
+    .field{display:grid;gap:8px}
+    .field.full{grid-column:1/-1}
+    label{font-size:14px;color:var(--muted);font-weight:600}
+    input,select{
+      min-height:54px;border-radius:16px;padding:0 14px;
+      background:rgba(255,255,255,.04);color:var(--text);
+      border:1px solid var(--line);outline:none;
+    }
+    input::placeholder{color:#7f857f}
+    .helper{font-size:12px;color:#808680}
+    .amount-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .chip.active{
+      background:rgba(0,200,83,.12);
+      border-color:rgba(0,200,83,.28);
+      color:var(--text);
+    }
+    .notice{
+      margin-top:16px;padding:14px 16px;border-radius:18px;
+      background:rgba(240,173,41,.1);border:1px solid rgba(240,173,41,.16);color:#f7db9a;
+      font-size:14px;
+    }
+    .form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .invoice-card{position:sticky;top:88px}
+    .status-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+    .status-pill{
+      display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;
+      border:1px solid rgba(0,200,83,.18);background:rgba(0,200,83,.1);color:#8ff3b5;font-size:12px;text-transform:uppercase;letter-spacing:.1em;
+    }
+    .status-dot{width:8px;height:8px;border-radius:999px;background:currentColor}
+    .invoice-box{
+      padding:16px;border-radius:20px;background:rgba(255,255,255,.03);border:1px solid var(--line);margin-top:12px;
+    }
+    .label{display:block;font-size:12px;color:#858b85;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+    .amount-big{font-size:44px;line-height:1;letter-spacing:-.06em}
+    .muted{color:var(--muted)}
+    .address{
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      word-break:break-all;color:#d6ffd6;font-size:14px
+    }
+    .copy-row,.invoice-actions,.network-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .copy-btn,.network-btn{border-radius:14px}
+    .network-btn.active{
+      background:rgba(0,200,83,.12);
+      border-color:rgba(0,200,83,.28);
+    }
+    .pay-btn{
+      width:100%;min-height:52px;border-radius:16px;border:none;cursor:pointer;
+      background:var(--green);color:#041108;font-weight:800;margin-top:12px;
+      box-shadow:0 14px 28px rgba(0,200,83,.18);
+    }
+    .progress{margin-top:12px;height:8px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.05)}
+    .progress>span{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),#69f0a5);transform-origin:left center}
+    .danger{
+      margin-top:14px;padding:14px 16px;border-radius:18px;
+      background:rgba(255,102,120,.08);border:1px solid rgba(255,102,120,.14);color:#ffb8c2;font-size:14px;
+    }
+    .lower{padding:0 0 30px}
+    .lower-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .info-card h3{font-size:24px;letter-spacing:-.04em;margin-bottom:12px}
+    .step{padding:14px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid var(--line);margin-top:10px}
+    .step strong{display:block;margin-bottom:4px}
+    .step p,.info-card li{color:var(--muted);font-size:14px}
+    .info-card ul{list-style:none;display:grid;gap:10px}
+    .footer{padding:0 0 28px;color:#7d837d;font-size:14px}
+    .modal{
+      position:fixed;inset:0;background:rgba(0,0,0,.64);backdrop-filter:blur(10px);
+      display:none;align-items:center;justify-content:center;padding:16px;z-index:50;
+    }
+    .modal.open{display:flex}
+    .modal-card{
+      width:min(760px,100%);max-height:88vh;overflow:auto;
+      background:#0c0c0c;border:1px solid var(--line);border-radius:28px;padding:22px;
+      box-shadow:0 30px 80px rgba(0,0,0,.45);
+    }
+    .modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+    .close-btn{
+      width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;
+    }
+    .hidden{display:none !important}
+    @media (max-width: 980px){
+      .hero-grid,.main-grid,.lower-grid{grid-template-columns:1fr}
+      .invoice-card{position:static}
+    }
+    @media (max-width: 700px){
+      .stats,.gateway-grid,.grid{grid-template-columns:1fr}
+      .topbar-inner,.status-row,.hero-actions,.form-actions,.copy-row,.invoice-actions,.network-row{flex-direction:column;align-items:stretch}
+      .nav-actions{justify-content:stretch}
+      .ghost-btn,.primary-btn,.secondary-btn,.copy-btn,.network-btn,.pay-btn{width:100%}
+      h1{max-width:12ch}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="#home">
+        <span class="logo">₱</span>
+        <span>Pay Rose</span>
+      </a>
+      <div class="nav-actions">
+        <button class="ghost-btn" type="button" onclick="scrollToSection('checkout')">Create Invoice</button>
+        <button class="ghost-btn" type="button" onclick="openHowToPay()">How to Pay</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="container hero-grid">
+        <article class="card hero-copy">
+          <div class="eyebrow">PYUSD · PayPal · Venmo</div>
+          <h1>Pay with PYUSD on the network you choose.</h1>
+          <p>Create a dedicated invoice for each customer, choose PayPal or Venmo, select Ethereum, Arbitrum, or Solana, and guide the customer through a clean payment flow.</p>
+          <div class="hero-actions">
+            <button class="primary-btn" type="button" onclick="scrollToSection('checkout')">Start Payment</button>
+            <button class="secondary-btn" type="button" onclick="openHowToPay()">Read Guide</button>
+          </div>
+          <div class="stats">
+            <div class="stat"><strong>2 options</strong><span>PayPal or Venmo</span></div>
+            <div class="stat"><strong>3 networks</strong><span>ETH, Arbitrum, Solana</span></div>
+            <div class="stat"><strong>15 min</strong><span>Invoice expiry</span></div>
+          </div>
+        </article>
+
+        <aside class="card hero-side">
+          <div class="mini">
+            <h3>Professional invoice flow</h3>
+            <p>Each customer gets a dedicated invoice experience with amount, network, timer, address, and live status display.</p>
+          </div>
+          <div class="mini">
+            <h3>Important payment note</h3>
+            <p>If the customer has 0 PYUSD, they should first buy PYUSD from their available balance for the same dollar amount they want to send.</p>
+          </div>
+          <div class="mini">
+            <h3>Network must match</h3>
+            <p>Always send PYUSD using the exact network shown on the invoice. Wrong network or wrong address can cause permanent loss of funds.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="main" id="checkout">
+      <div class="container main-grid">
+        <section class="card form-card">
+          <h2 class="section-title">Create your invoice</h2>
+          <p class="section-copy">Choose a payment source, enter the amount, select a network, and generate a customer invoice.</p>
+
+          <div class="gateway-grid" role="radiogroup" aria-label="Payment source">
+            <button type="button" class="gateway active" id="gateway-paypal" onclick="setGateway('paypal')">
+              <div class="gateway-head">
+                <div class="gateway-logo paypal-logo">P</div>
+                <span class="badge">Popular</span>
+              </div>
+              <h3>Pay with PayPal</h3>
+              <p>Customer opens PayPal, goes to crypto, chooses PYUSD, and sends to the invoice address.</p>
+            </button>
+
+            <button type="button" class="gateway" id="gateway-venmo" onclick="setGateway('venmo')">
+              <div class="gateway-head">
+                <div class="gateway-logo venmo-logo">V</div>
+                <span class="badge">Mobile flow</span>
+              </div>
+              <h3>Pay with Venmo</h3>
+              <p>Customer uses Venmo crypto, selects PYUSD, and pays using the network selected on the invoice.</p>
+            </button>
+          </div>
+
+          <form id="invoiceForm">
+            <div class="grid">
+              <div class="field full">
+                <label for="customer_name">Customer or invoice name</label>
+                <input id="customer_name" type="text" placeholder="e.g. John Smith / Order #2042" required />
+                <span class="helper">Use any label that helps identify this payment.</span>
+              </div>
+
+              <div class="field">
+                <label for="amount_usd">Amount in USD</label>
+                <input id="amount_usd" type="number" min="1" step="0.01" placeholder="50.00" required />
+                <div class="amount-chips">
+                  <button class="chip" type="button" onclick="setAmount(25)">$25</button>
+                  <button class="chip" type="button" onclick="setAmount(50)">$50</button>
+                  <button class="chip" type="button" onclick="setAmount(100)">$100</button>
+                  <button class="chip" type="button" onclick="setAmount(250)">$250</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="network">Network</label>
+                <select id="network" onchange="setNetwork(this.value)">
+                  <option value="ethereum">Ethereum</option>
+                  <option value="arbitrum">Arbitrum</option>
+                  <option value="solana">Solana</option>
+                </select>
+                <span class="helper">Customer must send on this exact network.</span>
+              </div>
+
+              <div class="field full">
+                <label for="note">Reference note</label>
+                <input id="note" type="text" placeholder="Optional internal note" />
+              </div>
+            </div>
+
+            <div class="notice">
+              If the customer has 0 PYUSD, tell them to first buy PYUSD from their PayPal or Venmo balance for the same dollar amount they want to pay, then send it to the invoice address.
+            </div>
+
+            <div class="form-actions">
+              <button class="primary-btn" type="submit" id="createBtn">Generate Invoice</button>
+              <button class="secondary-btn" type="button" onclick="openHowToPay()">How to Pay</button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="card invoice-card">
+          <div class="status-row">
+            <div>
+              <span class="label">Live preview</span>
+              <h2 style="font-size:28px;letter-spacing:-.04em">Invoice panel</h2>
+            </div>
+            <div class="status-pill" id="statusPill"><span class="status-dot"></span><span id="statusText">Awaiting payment</span></div>
+          </div>
+
+          <div class="invoice-box">
+            <span class="label">Total due</span>
+            <div class="amount-big" id="previewAmount">$50.00</div>
+            <p class="muted">Equivalent to <span id="previewPyusd">50.00 PYUSD</span></p>
+          </div>
+
+          <div class="invoice-box">
+            <span class="label">Payment source</span>
+            <strong id="previewGateway">PayPal</strong>
+            <p class="muted" style="margin-top:4px">Manual PYUSD transfer from the selected app.</p>
+          </div>
+
+          <div class="invoice-box">
+            <span class="label">Invoice ID</span>
+            <div id="previewInvoiceId">Not created yet</div>
+          </div>
+
+          <div class="invoice-box">
+            <span class="label">Address</span>
+            <div class="address" id="previewAddress">Waiting for invoice creation...</div>
+            <div class="copy-row">
+              <button class="copy-btn" type="button" onclick="copyAddress()">Copy Address</button>
+              <button class="copy-btn" type="button" onclick="copyAmount()">Copy Amount</button>
+            </div>
+          </div>
+
+          <div class="invoice-box">
+            <span class="label">Network</span>
+            <div class="network-row">
+              <button class="network-btn active" type="button" onclick="setNetwork('ethereum')">Ethereum</button>
+              <button class="network-btn" type="button" onclick="setNetwork('arbitrum')">Arbitrum</button>
+              <button class="network-btn" type="button" onclick="setNetwork('solana')">Solana</button>
+            </div>
+          </div>
+
+          <div class="invoice-box">
+            <span class="label">Invoice timer</span>
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+              <span class="muted">Expires in</span>
+              <strong id="timerText">15:00</strong>
+            </div>
+            <div class="progress"><span id="timerBar"></span></div>
+            <div class="invoice-actions">
+              <button class="pay-btn" type="button" onclick="payNow()">Pay Now</button>
+            </div>
+          </div>
+
+          <div class="danger">
+            Always confirm the network and address before sending. Crypto transfers usually cannot be reversed.
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="lower">
+      <div class="container lower-grid">
+        <article class="card info-card">
+          <h3>How to pay</h3>
+          <div class="step"><strong>1. Choose PayPal or Venmo</strong><p>Select the payment method from the homepage and create the invoice.</p></div>
+          <div class="step"><strong>2. Open the app</strong><p>Open PayPal or Venmo and go to the crypto section.</p></div>
+          <div class="step"><strong>3. Select PYUSD</strong><p>If PYUSD balance is 0, first buy the same amount of PYUSD you want to pay.</p></div>
+          <div class="step"><strong>4. Tap Send</strong><p>Paste the invoice address and confirm that the network matches the invoice.</p></div>
+          <div class="step"><strong>5. Confirm payment</strong><p>Send the correct amount and wait for payment status to update.</p></div>
+        </article>
+
+        <article class="card info-card">
+          <h3>Integration notes</h3>
+          <ul>
+            <li>This frontend calls a public backend invoice endpoint and then polls your <code>invoices</code> table for status.</li>
+            <li>The backend endpoint should create the wallet or invoice server-side and return invoice data to the browser.</li>
+            <li>Do not put any Railway private token, service-role key, or wallet secret in this file.</li>
+            <li>If your DB column names differ, update the mapping in <code>normalizeInvoiceRow()</code>.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">Frontend ready. Update the backend endpoint path if your production route uses a different URL.</div>
+  </footer>
+
+  <div class="modal" id="howToPayModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <span class="label">Payment guide</span>
+          <h2 style="font-size:30px;letter-spacing:-.05em">How to pay with PYUSD</h2>
+        </div>
+        <button class="close-btn" type="button" onclick="closeHowToPay()">✕</button>
+      </div>
+
+      <div class="step"><strong>Step 1</strong><p>Select PayPal or Venmo and create the invoice from the first page.</p></div>
+      <div class="step"><strong>Step 2</strong><p>Open the PayPal or Venmo app and go to the Crypto section.</p></div>
+      <div class="step"><strong>Step 3</strong><p>Choose PYUSD. If your PYUSD balance is 0, first buy the same amount of PYUSD you want to pay.</p></div>
+      <div class="step"><strong>Step 4</strong><p>Tap Send, paste the invoice address, and make sure the network matches the invoice.</p></div>
+      <div class="step"><strong>Step 5</strong><p>Enter the correct amount and confirm the payment. Wait for the invoice status to change.</p></div>
+
+      <div class="danger">
+        Wrong address or wrong network can cause permanent loss of funds.
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const CONFIG = {
+      APP_NAME: "Pay Rose",
+      SUPABASE_URL: "https://dkmgvtfkffovimoupnwe.supabase.co",
+      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRrbWd2dGZrZmZvdmltb3VwbndlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjQ5NjYsImV4cCI6MjA5NzMwMDk2Nn0.KiF8r5ADtZqK05ez0NzFuNfYmaz3Y72bOI646AJrHQs",
+      INVOICES_TABLE: "invoices",
+      BACKEND_CREATE_INVOICE_URL: "https://venmo-paypalcom-production.up.railway.app/api/invoice/create",
+      POLL_INTERVAL_MS: 6000,
+      DEFAULT_EXPIRY_MINUTES: 15
+    };
+
+    const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+
+    const state = {
+      gateway: "paypal",
+      network: "ethereum",
+      amount: 50,
+      invoice: null,
+      timerInterval: null,
+      pollInterval: null
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    window.scrollToSection = scrollToSection;
+
+    function formatMoney(value) {
+      return "$" + Number(value || 0).toFixed(2);
+    }
+
+    function formatStatus(status) {
+      const map = {
+        pending: "Awaiting payment",
+        paid: "Paid",
+        confirmed: "Confirmed",
+        expired: "Expired",
+        failed: "Failed"
+      };
+      return map[(status || "").toLowerCase()] || "Awaiting payment";
+    }
+
+    function setStatus(status) {
+      $("statusText").textContent = formatStatus(status);
+      const pill = $("statusPill");
+      pill.style.color = "#8ff3b5";
+      pill.style.background = "rgba(0,200,83,.1)";
+      pill.style.borderColor = "rgba(0,200,83,.18)";
+
+      if (status === "expired" || status === "failed") {
+        pill.style.color = "#ffb8c2";
+        pill.style.background = "rgba(255,102,120,.08)";
+        pill.style.borderColor = "rgba(255,102,120,.16)";
+      }
+      if (status === "paid" || status === "confirmed") {
+        pill.style.color = "#9ff7bf";
+      }
+    }
+
+    function setGateway(gateway) {
+      state.gateway = gateway;
+      $("gateway-paypal").classList.toggle("active", gateway === "paypal");
+      $("gateway-venmo").classList.toggle("active", gateway === "venmo");
+      $("previewGateway").textContent = gateway === "paypal" ? "PayPal" : "Venmo";
+    }
+    window.setGateway = setGateway;
+
+    function setNetwork(network) {
+      state.network = network;
+      $("network").value = network;
+      document.querySelectorAll(".network-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.textContent.toLowerCase() === network);
+      });
+      if (!state.invoice) return;
+      if (state.invoice.network && state.invoice.network !== network) {
+        setStatus("pending");
+      }
+    }
+    window.setNetwork = setNetwork;
+
+    function setAmount(amount) {
+      state.amount = Number(amount);
+      $("amount_usd").value = Number(amount).toFixed(2);
+      $("previewAmount").textContent = formatMoney(amount);
+      $("previewPyusd").textContent = Number(amount).toFixed(2) + " PYUSD";
+      document.querySelectorAll(".chip").forEach((chip) => {
+        chip.classList.toggle("active", chip.textContent.replace("$", "") === String(amount));
+      });
+    }
+    window.setAmount = setAmount;
+
+    function getSecondsLeft(expiresAt) {
+      const end = new Date(expiresAt).getTime();
+      const now = Date.now();
+      return Math.max(0, Math.floor((end - now) / 1000));
+    }
+
+    function startTimer(expiresAt) {
+      clearInterval(state.timerInterval);
+      const render = () => {
+        const left = getSecondsLeft(expiresAt);
+        const total = CONFIG.DEFAULT_EXPIRY_MINUTES * 60;
+        const minutes = Math.floor(left / 60);
+        const seconds = left % 60;
+        $("timerText").textContent = String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+        $("timerBar").style.transform = `scaleX(${left / total})`;
+        if (left <= 0) {
+          setStatus("expired");
+          clearInterval(state.timerInterval);
+        }
+      };
+      render();
+      state.timerInterval = setInterval(render, 1000);
+    }
+
+    function normalizeInvoiceRow(row) {
+      return {
+        id: row.id ?? null,
+        invoice_id: row.invoice_id ?? row.invoiceId ?? row.reference ?? null,
+        status: row.status ?? "pending",
+        provider: row.provider ?? row.gateway ?? state.gateway,
+        network: row.network ?? state.network,
+        address: row.address ?? row.wallet_address ?? row.deposit_address ?? "",
+        amount_usd: Number(row.amount_usd ?? row.amount ?? state.amount),
+        amount_pyusd: Number(row.amount_pyusd ?? row.pyusd_amount ?? row.amount_usd ?? state.amount),
+        expires_at: row.expires_at ?? row.expiresAt ?? new Date(Date.now() + CONFIG.DEFAULT_EXPIRY_MINUTES * 60000).toISOString(),
+        tx_hash: row.tx_hash ?? null
+      };
+    }
+
+    function renderInvoice(invoice) {
+      state.invoice = normalizeInvoiceRow(invoice);
+      $("previewInvoiceId").textContent = state.invoice.invoice_id || "Pending";
+      $("previewAmount").textContent = formatMoney(state.invoice.amount_usd);
+      $("previewPyusd").textContent = Number(state.invoice.amount_pyusd).toFixed(2) + " PYUSD";
+      $("previewGateway").textContent = state.invoice.provider === "venmo" ? "Venmo" : "PayPal";
+      $("previewAddress").textContent = state.invoice.address || "Address not returned by backend";
+      setStatus(state.invoice.status);
+      setNetwork(state.invoice.network);
+      startTimer(state.invoice.expires_at);
+    }
+
+    async function createInvoiceOnBackend(payload) {
+      const res = await fetch(CONFIG.BACKEND_CREATE_INVOICE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Invoice endpoint failed");
+      }
+
+      const data = await res.json();
+      if (!data) throw new Error("Empty invoice response");
+
+      return normalizeInvoiceRow(data.invoice || data.data || data);
+    }
+
+    async function pollInvoice(invoiceId) {
+      if (!invoiceId) return;
+      const { data, error } = await supabase
+        .from(CONFIG.INVOICES_TABLE)
+        .select("*")
+        .eq("invoice_id", invoiceId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Poll error:", error.message);
+        return;
+      }
+      if (!data) return;
+
+      renderInvoice(data);
+
+      const status = (data.status || "").toLowerCase();
+      if (["paid", "confirmed", "expired", "failed"].includes(status)) {
+        clearInterval(state.pollInterval);
+      }
+    }
+
+    function startPolling(invoiceId) {
+      clearInterval(state.pollInterval);
+      pollInvoice(invoiceId);
+      state.pollInterval = setInterval(() => pollInvoice(invoiceId), CONFIG.POLL_INTERVAL_MS);
+    }
+
+    async function handleCreateInvoice(e) {
+      e.preventDefault();
+
+      const customer_name = $("customer_name").value.trim();
+      const amount_usd = Number($("amount_usd").value);
+      const network = $("network").value;
+      const note = $("note").value.trim();
+
+      if (!customer_name || !amount_usd || amount_usd <= 0) {
+        alert("Please enter a valid customer name and amount.");
+        return;
+      }
+
+      const btn = $("createBtn");
+      btn.disabled = true;
+      btn.textContent = "Creating...";
+
+      try {
+        const payload = {
+          customer_name,
+          amount_usd,
+          network,
+          provider: state.gateway,
+          note
+        };
+
+        const invoice = await createInvoiceOnBackend(payload);
+        renderInvoice(invoice);
+        startPolling(invoice.invoice_id);
+      } catch (err) {
+        console.error(err);
+        alert("Invoice creation failed. Check your backend endpoint path and returned JSON shape.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Generate Invoice";
+      }
+    }
+
+    async function copyText(value, label) {
+      if (!value) return;
+      try {
+        await navigator.clipboard.writeText(String(value));
+        $("statusText").textContent = label + " copied";
+        setTimeout(() => {
+          setStatus(state.invoice?.status || "pending");
+        }, 1300);
+      } catch {
+        alert("Copy failed. Please copy manually.");
+      }
+    }
+
+    function copyAddress() {
+      copyText(state.invoice?.address || $("previewAddress").textContent, "Address");
+    }
+    window.copyAddress = copyAddress;
+
+    function copyAmount() {
+      copyText(state.invoice?.amount_pyusd || state.amount, "Amount");
+    }
+    window.copyAmount = copyAmount;
+
+    function openHowToPay() {
+      $("howToPayModal").classList.add("open");
+      $("howToPayModal").setAttribute("aria-hidden", "false");
+    }
+    window.openHowToPay = openHowToPay;
+
+    function closeHowToPay() {
+      $("howToPayModal").classList.remove("open");
+      $("howToPayModal").setAttribute("aria-hidden", "true");
+    }
+    window.closeHowToPay = closeHowToPay;
+
+    function payNow() {
+      openHowToPay();
+    }
+    window.payNow = payNow;
+
+    $("howToPayModal").addEventListener("click", (e) => {
+      if (e.target.id === "howToPayModal") closeHowToPay();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeHowToPay();
+    });
+
+    $("amount_usd").addEventListener("input", (e) => {
+      const value = Number(e.target.value || 0);
+      state.amount = value;
+      $("previewAmount").textContent = formatMoney(value);
+      $("previewPyusd").textContent = Number(value || 0).toFixed(2) + " PYUSD";
+      document.querySelectorAll(".chip").forEach((chip) => chip.classList.remove("active"));
+    });
+
+    $("invoiceForm").addEventListener("submit", handleCreateInvoice);
+
+    setGateway("paypal");
+    setAmount(50);
+    setNetwork("ethereum");
+  </script>
+</body>
+</html>
