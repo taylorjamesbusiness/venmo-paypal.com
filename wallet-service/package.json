@@ -1,0 +1,13 @@
+{
+  "name": "wallet-service",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@coinbase/cdp-sdk": "latest",
+    "express": "^4.18.2"
+  }
+}
