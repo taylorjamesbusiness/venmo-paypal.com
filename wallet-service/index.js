@@ -4,11 +4,18 @@ import { CdpClient } from "@coinbase/cdp-sdk";
 const app = express();
 app.use(express.json());
 
-const cdp = new CdpClient({
-  apiKeyId: process.env.CDP_API_KEY_ID,
-  apiKeySecret: process.env.CDP_API_KEY_SECRET,
-  walletSecret: process.env.CDP_WALLET_SECRET,
-});
+// lazy init — not at top level
+let _cdp = null;
+function getCdp() {
+  if (!_cdp) {
+    _cdp = new CdpClient({
+      apiKeyId: process.env.CDP_API_KEY_ID,
+      apiKeySecret: process.env.CDP_API_KEY_SECRET,
+      walletSecret: process.env.CDP_WALLET_SECRET,
+    });
+  }
+  return _cdp;
+}
 
 const TOKEN = process.env.WALLET_SERVICE_TOKEN;
 
@@ -28,6 +35,7 @@ app.post("/wallet/create", authCheck, async (req, res) => {
       return res.status(400).json({ error: "network and wallet_name required" });
     }
 
+    const cdp = getCdp();
     let address = "";
     let account_type = "";
 
