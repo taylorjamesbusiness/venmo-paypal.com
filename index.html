@@ -27,7 +27,6 @@
       box-shadow: 0 8px 40px rgba(0,0,0,0.6);
     }
 
-    /* ── Header ── */
     .header { text-align: center; margin-bottom: 28px; }
 
     .avatar {
@@ -54,7 +53,6 @@
     }
     .badge .dot { width: 7px; height: 7px; background: #00c48c; border-radius: 50%; }
 
-    /* ── Network selector ── */
     .section-label {
       font-size: 11px;
       font-weight: 600;
@@ -88,7 +86,6 @@
       color: #009cde;
     }
 
-    /* ── Amount presets ── */
     .amounts-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -126,8 +123,30 @@
     }
     .show-more:hover { color: #888; }
 
-    /* ── Custom amount ── */
-    .email-wrap {           display: flex;           align-items: center;           background: #1a1a1a;           border: 1.5px solid #222;           border-radius: 14px;           padding: 0 14px;           margin-bottom: 14px;           transition: border-color 0.2s;         }         .email-wrap:focus-within { border-color: #009cde; }         .email-icon { color: #555; margin-right: 8px; font-size: 16px; }         .email-input {           background: transparent;           border: none;           outline: none;           color: #fff;           font-size: 15px;           padding: 14px 0;           width: 100%;         }         .email-input::placeholder { color: #555; }          .custom-wrap {
+    .email-wrap {
+      display: flex;
+      align-items: center;
+      background: #1a1a1a;
+      border: 1.5px solid #222;
+      border-radius: 14px;
+      padding: 0 14px;
+      margin-bottom: 14px;
+      transition: border-color 0.2s;
+    }
+    .email-wrap:focus-within { border-color: #009cde; }
+    .email-icon { color: #555; margin-right: 8px; font-size: 16px; }
+    .email-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 15px;
+      padding: 14px 0;
+      width: 100%;
+    }
+    .email-input::placeholder { color: #555; }
+
+    .custom-wrap {
       position: relative; margin-bottom: 20px;
     }
     .custom-wrap .currency {
@@ -150,7 +169,6 @@
     .custom-input:focus { border-color: #009cde; }
     .custom-input::placeholder { color: #333; }
 
-    /* ── Pay buttons ── */
     .pay-btn {
       width: 100%;
       padding: 16px;
@@ -160,7 +178,7 @@
       font-weight: 700;
       cursor: pointer;
       transition: all 0.18s;
-      display: flex; align-items: center; justify-content: center; gap-10px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
       margin-bottom: 10px;
       letter-spacing: 0.2px;
     }
@@ -184,7 +202,6 @@
 
     .btn-icon { font-size: 20px; margin-right: 8px; }
 
-    /* ── Divider ── */
     .divider {
       display: flex; align-items: center; gap: 10px;
       margin: 4px 0 10px;
@@ -194,14 +211,12 @@
       content: ""; flex: 1; height: 1px; background: #222;
     }
 
-    /* ── Footer ── */
     .footer {
       text-align: center; margin-top: 20px;
       font-size: 11px; color: #444;
     }
     .footer span { color: #009cde; }
 
-    /* ── Toast ── */
     .toast {
       position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
       background: #1e1e1e; border: 1px solid #333;
@@ -215,26 +230,6 @@
     .toast.success { border-color: #00c48c; color: #00c48c; }
     .toast.error   { border-color: #ff4d4f; color: #ff4d4f; }
 
-    /* ── Invoice result ── */
-    .result-box {
-      display: none;
-      margin-top: 18px;
-      background: #0d1f0d;
-      border: 1px solid #1a3a1a;
-      border-radius: 16px;
-      padding: 18px;
-    }
-    .result-box.visible { display: block; }
-    .result-label { font-size: 11px; color: #555; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.6px; }
-    .result-addr {
-      font-size: 13px; color: #00c48c;
-      word-break: break-all; margin-bottom: 14px;
-      cursor: pointer;
-    }
-    .result-addr:hover { text-decoration: underline; }
-    .result-meta { font-size: 12px; color: #555; }
-    .result-meta span { color: #888; }
-
     @media (max-width: 440px) {
       .card { border-radius: 0; border-left: none; border-right: none; min-height: 100dvh; padding: 40px 20px 28px; }
     }
@@ -243,7 +238,6 @@
 <body>
 
 <div class="card">
-  <!-- Header -->
   <div class="header">
     <div class="avatar">₱</div>
     <h1>Pay Rose</h1>
@@ -253,7 +247,6 @@
     </div>
   </div>
 
-  <!-- Network -->
   <p class="section-label">Network</p>
   <div class="network-row">
     <button class="net-btn active" data-net="ethereum">Ethereum</button>
@@ -261,7 +254,6 @@
     <button class="net-btn"        data-net="solana">Solana</button>
   </div>
 
-  <!-- Preset amounts -->
   <p class="section-label">Select Amount</p>
   <div class="amounts-grid" id="presets">
     <button class="amt-btn" data-amt="10">$10</button>
@@ -282,7 +274,6 @@
     </div>
   </div>
 
-  <!-- Custom amount -->
   <div class="custom-wrap">
     <span class="currency">$</span>
     <input
@@ -297,7 +288,18 @@
     />
   </div>
 
-  <!-- Email input -->         <div class="email-wrap">           <span class="email-icon">&#9993;</span>           <input             class="email-input"             id="recipientEmail"             type="email"             placeholder="Your email address"             autocomplete="email"             required           />         </div>          <!-- Pay buttons -->
+  <div class="email-wrap">
+    <span class="email-icon">&#9993;</span>
+    <input
+      class="email-input"
+      id="recipientEmail"
+      type="email"
+      placeholder="Your email address"
+      autocomplete="email"
+      required
+    />
+  </div>
+
   <button class="pay-btn btn-paypal" id="btnPaypal" disabled>
     <span class="btn-icon">🅿️</span> Pay with PayPal
   </button>
@@ -308,33 +310,18 @@
     <span class="btn-icon">💙</span> Pay with Venmo
   </button>
 
-  <!-- Invoice result -->
-  <div class="result-box" id="resultBox">
-    <p class="result-label">Send PYUSD to this address</p>
-    <p class="result-addr" id="resultAddr" title="Click to copy"></p>
-    <p class="result-meta">
-      Invoice: <span id="resultCode"></span> &nbsp;·&nbsp;
-      Expires: <span id="resultExpiry"></span>
-    </p>
-  </div>
-
-  <!-- Footer -->
   <div class="footer">Powered by <span>PayPal PYUSD</span></div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-  // ── Config ───────────────────────────────────────────────
-  // Replace with your Supabase edge function URL
+  // ── Config ──
   const API_URL = "https://dkmgvtfkffovimoupnwe.supabase.co/functions/v1/invoice-create";
 
-  // ── State ────────────────────────────────────────────────
   let selectedNetwork = "ethereum";
   let selectedAmount  = null;
 
-  // ── Network buttons ──────────────────────────────────────
   document.querySelectorAll(".net-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".net-btn").forEach(b => b.classList.remove("active"));
@@ -343,7 +330,6 @@
     });
   });
 
-  // ── Preset amount buttons ────────────────────────────────
   document.querySelectorAll(".amt-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".amt-btn").forEach(b => b.classList.remove("active"));
@@ -354,14 +340,12 @@
     });
   });
 
-  // ── Custom amount input ──────────────────────────────────
   document.getElementById("customAmt").addEventListener("input", (e) => {
     document.querySelectorAll(".amt-btn").forEach(b => b.classList.remove("active"));
     selectedAmount = e.target.value ? Number(e.target.value) : null;
     updatePayButtons();
   });
 
-  // ── Show more ────────────────────────────────────────────
   let moreShown = false;
   document.getElementById("showMore").addEventListener("click", () => {
     moreShown = !moreShown;
@@ -369,14 +353,12 @@
     document.getElementById("showMore").textContent = moreShown ? "▴ Show less" : "▾ Show more amounts";
   });
 
-  // ── Enable/disable pay buttons ───────────────────────────
   function updatePayButtons() {
     const valid = selectedAmount && selectedAmount >= 1 && selectedAmount <= 2000;
     document.getElementById("btnPaypal").disabled = !valid;
     document.getElementById("btnVenmo").disabled  = !valid;
   }
 
-  // ── Toast helper ─────────────────────────────────────────
   function showToast(msg, type = "") {
     const t = document.getElementById("toast");
     t.textContent = msg;
@@ -384,47 +366,48 @@
     setTimeout(() => { t.className = "toast"; }, 3200);
   }
 
-  // ── Create invoice ───────────────────────────────────────
+  // ── Create invoice → redirect to invoice.html ──
   async function createInvoice(via) {
+    const email = document.getElementById("recipientEmail").value.trim();
+    if (!email) {
+      showToast("Please enter your email address", "error");
+      return;
+    }
+
     const btnPaypal = document.getElementById("btnPaypal");
     const btnVenmo  = document.getElementById("btnVenmo");
     btnPaypal.disabled = true;
     btnVenmo.disabled  = true;
-    btnPaypal.textContent = "Creating…";
-    btnVenmo.textContent  = "Creating…";
+    btnPaypal.innerHTML = '<span class="btn-icon">🅿️</span> Creating...';
+    btnVenmo.innerHTML  = '<span class="btn-icon">💙</span> Creating...';
 
     try {
       const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          asset:       "PYUSD",
-          network:     selectedNetwork,
-          amount_usd:  selectedAmount,
-          amount: String(selectedAmount),             recipient_email: document.getElementById('recipientEmail').value.trim(),             note: via === 'paypal' ? 'PayPal PYUSD' : 'Venmo PYUSD',   // "paypal" or "venmo"
+          asset:           "PYUSD",
+          network:         selectedNetwork,
+          amount_usd:      selectedAmount,
+          amount:          String(selectedAmount),
+          recipient_email: email,
+          note:            via === "paypal" ? "PayPal PYUSD" : "Venmo PYUSD",
         }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Invoice creation failed");
 
-      const inv = data;
-
-      // Show result
-      const addrEl  = document.getElementById("resultAddr");
-      addrEl.textContent = inv.wallet_address;
-      addrEl.onclick = () => {
-        navigator.clipboard.writeText(inv.wallet_address);
-        showToast("Address copied!", "success");
-      };
-
-      document.getElementById("resultCode").textContent   = inv.invoice_code;
-      document.getElementById("resultBox").classList.add("visible");
-      showToast("Invoice created! Copy the address below.", "success");
+      // Redirect to invoice 2nd page
+      const invoiceId = data.invoice_id || data.id;
+      if (invoiceId) {
+        window.location.href = `invoice.html?id=${invoiceId}`;
+      } else {
+        throw new Error("No invoice ID returned");
+      }
 
     } catch (e) {
       showToast(e.message, "error");
-    } finally {
       btnPaypal.disabled = false;
       btnVenmo.disabled  = false;
       btnPaypal.innerHTML = '<span class="btn-icon">🅿️</span> Pay with PayPal';

@@ -1,1 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a0a; color: #fff; font-family: system-ui, sans-serif; min-height: 100vh; }
+    .container { max-width: 420px; margin: 0 auto; padding: 20px; }
 
+    .topbar { display: flex; align-items: center; padding: 12px 0; }
+    .back-btn { background: none; border: none; color: #aaa; font-size: 14px; cursor: pointer; }
+    .page-title { flex: 1; text-align: center; font-size: 14px; color: #888; margin-right: 40px; }
+
+    .amount-section { text-align: center; margin: 24px 0 8px; }
+    .amount { font-size: 36px; font-weight: 700; }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(234,179,8,0.15); color: #fbbf24;
+      border-radius: 999px; padding: 4px 12px;
+      font-size: 11px; letter-spacing: 1px; font-weight: 600; margin-top: 8px;
+    }
+    .dot { width: 6px; height: 6px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    .timer { text-align: center; font-family: monospace; font-size: 16px; color: #888; margin: 8px 0 20px; }
+    .timer span { color: #fff; font-size: 18px; }
+
+    .qr-wrapper {
+      position: relative; display: flex;
+      justify-content: center; align-items: center; margin: 0 auto 24px;
+      width: 200px; height: 200px;
+    }
+    #qrcode canvas, #qrcode img { border-radius: 8px; }
+    .qr-logo {
+      position: absolute; background: #fff; border-radius: 50%;
+      padding: 4px; width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 0 2px #fff;
+    }
+    .qr-logo img { width: 26px; height: 26px; object-fit: contain; }
+
+    .details { background: #1a1a1a; border-radius: 12px; padding: 16px; margin-bottom: 20px; font-size: 13px; }
+    .detail-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .detail-row:last-child { margin-bottom: 0; }
+    .detail-label { color: #888; }
+    .detail-value { color: #fff; font-weight: 500; font-family: monospace; }
+
+    .address-box { background: #1a1a1a; border-radius: 12px; padding: 14px; margin-bottom: 20px; }
+    .address-title { font-size: 11px; color: #888; margin-bottom: 6px; }
+    .address-text { font-size: 11px; font-family: monospace; color: #ccc; word-break: break-all; }
+    .copy-link { display: block; text-align: center; margin-top: 8px; color: #60a5fa; font-size: 12px; cursor: pointer; text-decoration: underline; }
+
+    .btn-paypal {
+      width: 100%; padding: 14px; border: none; border-radius: 12px;
+      background: #fff; color: #000; font-size: 15px; font-weight: 600;
+      cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-venmo {
+      width: 100%; padding: 14px; border: none; border-radius: 12px;
+      background: #3d95ce; color: #fff; font-size: 15px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-paypal:disabled, .btn-venmo:disabled { opacity: 0.4; cursor: not-allowed; }
+    .expired-msg { text-align: center; color: #ef4444; font-size: 13px; margin-bottom: 12px; }
+
+    .loading { text-align: center; padding: 60px 20px; color: #888; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="topbar">
+    <button class="back-btn" onclick="history.back()">← Back</button>
+    <div class="page-title">Invoice</div>
+  </div>
+
+  <div id="loading" class="loading">Loading invoice...</div>
+  <div id="content" style="display:none">
+
+    <div class="amount-section">
+      <div class="amount" id="inv-amount">$0.00</div>
+      <div class="status-badge"><span class="dot"></span><span id="inv-status">AWAITING PAYMENT</span></div>
+    </div>
+
+    <div class="timer">Expires in <span id="countdown">60:00</span></div>
+
+    <div class="qr-wrapper">
+      <div id="qrcode"></div>
+      <div class="qr-logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png" alt="PYUSD" />
+      </div>
+    </div>
+
+    <div class="details">
+      <div class="detail-row">
+        <span class="detail-label">Reference</span>
+        <span class="detail-value" id="inv-code">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Network</span>
+        <span class="detail-value" id="inv-network">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Asset</span>
+        <span class="detail-value" id="inv-asset">PYUSD</span>
+      </div>
+    </div>
+
+    <div class="address-box">
+      <div class="address-title">PYUSD Deposit Address</div>
+      <div class="address-text" id="inv-address">—</div>
+      <span class="copy-link" onclick="copyAddress()">Copy Invoice Address</span>
+    </div>
+
+    <div id="expired-msg" class="expired-msg" style="display:none">⚠️ Invoice expired</div>
+
+    <button class="btn-paypal" id="btn-paypal" onclick="payWithPayPal()">
+      🅿️ Pay with PayPal
+    </button>
+    <button class="btn-venmo" id="btn-venmo" onclick="payWithVenmo()">
+      💙 Pay with Venmo
+    </button>
+  </div>
+</div>
+
+<script>
+  // ── CONFIG: replace these with your actual values ──
+  const EDGE_URL = "https://dkmgvtfkffovimoupnwe.supabase.co/functions/v1";
+  const VENMO_USERNAME = "YourVenmoUsername"; // ← তোমার Venmo username দাও
+  const PAYPAL_USERNAME = "YourPayPalUsername"; // ← তোমার PayPal.me username দাও
+
+  let invoice = null;
+  let timerInterval = null;
+
+  const params = new URLSearchParams(window.location.search);
+  const invoiceId = params.get("id");
+
+  async function loadInvoice() {
+    if (!invoiceId) {
+      document.getElementById("loading").textContent = "Invalid invoice link.";
+      return;
+    }
+    try {
+      const res = await fetch(`${EDGE_URL}/get-invoice?id=${invoiceId}`);
+      if (!res.ok) throw new Error("Not found");
+      invoice = await res.json();
+      renderInvoice();
+    } catch (e) {
+      document.getElementById("loading").textContent = "Invoice not found.";
+    }
+  }
+
+  function renderInvoice() {
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("content").style.display = "block";
+
+    document.getElementById("inv-amount").textContent = `$${Number(invoice.amount_usd).toFixed(2)}`;
+    document.getElementById("inv-code").textContent = invoice.invoice_code;
+    document.getElementById("inv-network").textContent =
+      invoice.network.charAt(0).toUpperCase() + invoice.network.slice(1);
+    document.getElementById("inv-asset").textContent = invoice.asset;
+    document.getElementById("inv-address").textContent =
+      invoice.wallet_address || invoice.deposit_address || "—";
+
+    const qrTarget = invoice.wallet_address || invoice.deposit_address || "unknown";
+    new QRCode(document.getElementById("qrcode"), {
+      text: qrTarget,
+      width: 200, height: 200,
+      colorDark: "#000000", colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
+    });
+
+    startTimer();
+  }
+
+  function startTimer() {
+    const expiresAt = new Date(invoice.expires_at).getTime();
+    function tick() {
+      const diff = expiresAt - Date.now();
+      if (diff <= 0) {
+        document.getElementById("countdown").textContent = "00:00";
+        document.getElementById("expired-msg").style.display = "block";
+        document.getElementById("btn-paypal").disabled = true;
+        document.getElementById("btn-venmo").disabled = true;
+        document.getElementById("inv-status").textContent = "EXPIRED";
+        clearInterval(timerInterval);
+        return;
+      }
+      const m = String(Math.floor(diff / 60000)).padStart(2, "0");
+      const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
+      document.getElementById("countdown").textContent = `${m}:${s}`;
+    }
+    tick();
+    timerInterval = setInterval(tick, 1000);
+  }
+
+  function copyAddress() {
+    const addr = invoice?.wallet_address || invoice?.deposit_address;
+    if (!addr) return;
+    navigator.clipboard.writeText(addr).then(() => alert("Address copied!"));
+  }
+
+  function payWithPayPal() {
+    const paypalLink = `https://www.paypal.com/paypalme/${PAYPAL_USERNAME}/${Number(invoice.amount_usd).toFixed(2)}USD`;
+    window.location.href = paypalLink;
+  }
+
+  function payWithVenmo() {
+    const amount = Number(invoice.amount_usd).toFixed(2);
+    const note = encodeURIComponent(`Invoice ${invoice.invoice_code}`);
+    const url = `https://venmo.com/${VENMO_USERNAME}?txn=pay&amount=${amount}&note=${note}&audience=private`;
+    window.location.href = url;
+  }
+
+  loadInvoice();
+</script>
+</body>
+</html>
