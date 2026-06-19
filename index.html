@@ -86,6 +86,21 @@
       color: #009cde;
     }
 
+    /* ── Low fee badge ── */
+    .rec-badge {
+      display: inline-block;
+      background: rgba(0,196,140,0.15);
+      color: #00c48c;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      border-radius: 6px;
+      padding: 2px 5px;
+      margin-left: 4px;
+      vertical-align: middle;
+      text-transform: uppercase;
+    }
+
     .amounts-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -250,8 +265,9 @@
   <p class="section-label">Network</p>
   <div class="network-row">
     <button class="net-btn active" data-net="ethereum">Ethereum</button>
-    <button class="net-btn"        data-net="arbitrum">Arbitrum</button>
-    <button class="net-btn"        data-net="solana">Solana</button>
+    <button class="net-btn" data-net="solana">
+      Solana <span class="rec-badge">low fee</span>
+    </button>
   </div>
 
   <p class="section-label">Select Amount</p>
@@ -316,7 +332,6 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // ── Config ──
   const API_URL = "https://dkmgvtfkffovimoupnwe.supabase.co/functions/v1/invoice-create";
 
   let selectedNetwork = "ethereum";
@@ -366,7 +381,6 @@
     setTimeout(() => { t.className = "toast"; }, 3200);
   }
 
-  // ── Create invoice → redirect to invoice.html ──
   async function createInvoice(via) {
     const email = document.getElementById("recipientEmail").value.trim();
     if (!email) {
@@ -398,7 +412,6 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Invoice creation failed");
 
-      // Redirect to invoice 2nd page
       const invoiceId = data.invoice_id || data.id;
       if (invoiceId) {
         window.location.href = `invoice.html?id=${invoiceId}`;
