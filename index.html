@@ -408,20 +408,17 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Invoice creation failed");
 
-      const inv = data.invoice;
+      const inv = data;
 
       // Show result
       const addrEl  = document.getElementById("resultAddr");
-      addrEl.textContent = inv.deposit_address;
+      addrEl.textContent = inv.wallet_address;
       addrEl.onclick = () => {
-        navigator.clipboard.writeText(inv.deposit_address);
+        navigator.clipboard.writeText(inv.wallet_address);
         showToast("Address copied!", "success");
       };
 
       document.getElementById("resultCode").textContent   = inv.invoice_code;
-      document.getElementById("resultExpiry").textContent =
-        new Date(inv.expires_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
       document.getElementById("resultBox").classList.add("visible");
       showToast("Invoice created! Copy the address below.", "success");
 
