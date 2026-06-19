@@ -86,7 +86,6 @@
       color: #009cde;
     }
 
-    /* ── Low fee badge ── */
     .rec-badge {
       display: inline-block;
       background: rgba(0,196,140,0.15);
@@ -192,7 +191,7 @@
     .pay-btn:active { transform: translateY(0); }
     .pay-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
-    .btn-icon { font-size: 20px; margin-right: 8px; }
+    .btn-icon { font-size: 20px; }
 
     .divider {
       display: flex; align-items: center; gap: 10px;
@@ -300,7 +299,7 @@
   const API_URL = "https://dkmgvtfkffovimoupnwe.supabase.co/functions/v1/invoice-create";
 
   let selectedNetwork = "ethereum";
-  let selectedAmount  = null;
+  let selectedAmount = null;
 
   document.querySelectorAll(".net-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -336,7 +335,7 @@
   function updatePayButtons() {
     const valid = selectedAmount && selectedAmount >= 1 && selectedAmount <= 2000;
     document.getElementById("btnPaypal").disabled = !valid;
-    document.getElementById("btnVenmo").disabled  = !valid;
+    document.getElementById("btnVenmo").disabled = !valid;
   }
 
   function showToast(msg, type = "") {
@@ -347,30 +346,24 @@
   }
 
   async function createInvoice(via) {
-    const email = document.getElementById("recipientEmail").value.trim();
-    if (!email) {
-      showToast("Please enter your email address", "error");
-      return;
-    }
-
     const btnPaypal = document.getElementById("btnPaypal");
-    const btnVenmo  = document.getElementById("btnVenmo");
+    const btnVenmo = document.getElementById("btnVenmo");
+
     btnPaypal.disabled = true;
-    btnVenmo.disabled  = true;
+    btnVenmo.disabled = true;
     btnPaypal.innerHTML = '<span class="btn-icon">🅿️</span> Creating...';
-    btnVenmo.innerHTML  = '<span class="btn-icon">💙</span> Creating...';
+    btnVenmo.innerHTML = '<span class="btn-icon">💙</span> Creating...';
 
     try {
       const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          asset:           "PYUSD",
-          network:         selectedNetwork,
-          amount_usd:      selectedAmount,
-          amount:          String(selectedAmount),
-          recipient_email: email,
-          note:            via === "paypal" ? "PayPal PYUSD" : "Venmo PYUSD",
+          asset: "PYUSD",
+          network: selectedNetwork,
+          amount_usd: selectedAmount,
+          amount: String(selectedAmount),
+          note: via === "paypal" ? "PayPal PYUSD" : "Venmo PYUSD"
         }),
       });
 
@@ -385,17 +378,17 @@
       }
 
     } catch (e) {
-      showToast(e.message, "error");
+      showToast(e.message || "Invoice creation failed", "error");
       btnPaypal.disabled = false;
-      btnVenmo.disabled  = false;
+      btnVenmo.disabled = false;
       btnPaypal.innerHTML = '<span class="btn-icon">🅿️</span> Pay with PayPal';
-      btnVenmo.innerHTML  = '<span class="btn-icon">💙</span> Pay with Venmo';
+      btnVenmo.innerHTML = '<span class="btn-icon">💙</span> Pay with Venmo';
       updatePayButtons();
     }
   }
 
   document.getElementById("btnPaypal").addEventListener("click", () => createInvoice("paypal"));
-  document.getElementById("btnVenmo").addEventListener("click",  () => createInvoice("venmo"));
+  document.getElementById("btnVenmo").addEventListener("click", () => createInvoice("venmo"));
 </script>
 </body>
 </html>
