@@ -3,97 +3,238 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Invoice</title>
+  <title>Invoice · Pay Rose</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0a0a0a; color: #fff; font-family: system-ui, sans-serif; min-height: 100vh; }
-    .container { max-width: 420px; margin: 0 auto; padding: 20px; }
+    body { background: #0a0a0a; color: #fff; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+    .container { max-width: 420px; margin: 0 auto; padding: 16px 20px 40px; }
 
-    .topbar { display: flex; align-items: center; padding: 12px 0; }
-    .back-btn { background: none; border: none; color: #aaa; font-size: 14px; cursor: pointer; }
-    .page-title { flex: 1; text-align: center; font-size: 14px; color: #888; margin-right: 40px; }
-
-    .amount-section { text-align: center; margin: 24px 0 8px; }
-    .amount { font-size: 36px; font-weight: 700; }
-    .status-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(234,179,8,0.15); color: #fbbf24;
-      border-radius: 999px; padding: 4px 12px;
-      font-size: 11px; letter-spacing: 1px; font-weight: 600; margin-top: 8px;
+    /* ── Top bar ── */
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 0 20px; }
+    .back-btn { background: none; border: none; color: #666; font-size: 13px; cursor: pointer; padding: 6px 0; }
+    .how-btn {
+      background: none; border: 1.5px solid #333; border-radius: 20px;
+      color: #aaa; font-size: 12px; font-weight: 600; padding: 6px 14px; cursor: pointer;
+      display: flex; align-items: center; gap: 5px; transition: border-color 0.2s;
     }
-    .dot { width: 6px; height: 6px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .how-btn:hover { border-color: #555; color: #fff; }
 
-    .timer { text-align: center; font-family: monospace; font-size: 16px; color: #888; margin: 8px 0 20px; }
-    .timer span { color: #fff; font-size: 18px; }
+    /* ── Amount section ── */
+    .amount-section { text-align: center; margin-bottom: 6px; }
+    .amount-label { font-size: 10px; color: #555; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+    .amount { font-size: 42px; font-weight: 800; letter-spacing: -1px; }
+    .scan-hint { font-size: 12px; color: #555; margin-top: 4px; }
 
-    .qr-wrapper {
-      position: relative; display: flex;
-      justify-content: center; align-items: center; margin: 0 auto 24px;
-      width: 200px; height: 200px;
+    /* ── QR wrapper ── */
+    .qr-section { display: flex; flex-direction: column; align-items: center; margin: 20px 0; }
+    .qr-outer {
+      background: #fff; border-radius: 20px; padding: 14px;
+      position: relative; display: inline-flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 0 1px #1a1a1a;
     }
-    #qrcode canvas, #qrcode img { border-radius: 8px; }
+    #qrcode canvas, #qrcode img { display: block; border-radius: 4px; }
     .qr-logo {
-      position: absolute; background: #fff; border-radius: 50%;
-      padding: 4px; width: 36px; height: 36px;
+      position: absolute;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #fff; border: 3px solid #fff;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 0 2px #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      overflow: hidden;
     }
-    .qr-logo img { width: 26px; height: 26px; object-fit: contain; }
+    .qr-logo img { width: 34px; height: 34px; object-fit: contain; }
 
-    .details { background: #1a1a1a; border-radius: 12px; padding: 16px; margin-bottom: 20px; font-size: 13px; }
-    .detail-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
-    .detail-row:last-child { margin-bottom: 0; }
-    .detail-label { color: #888; }
-    .detail-value { color: #fff; font-weight: 500; font-family: monospace; }
+    /* ── Timer ── */
+    .timer-box {
+      background: #111; border: 1px solid #1e1e1e; border-radius: 14px;
+      padding: 14px 20px; margin-bottom: 16px; text-align: center;
+    }
+    .timer-label { font-size: 10px; color: #555; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+    .timer-value { font-family: monospace; font-size: 28px; font-weight: 700; color: #fff; letter-spacing: 4px; }
+    .timer-value.urgent { color: #ef4444; }
 
-    .address-box { background: #1a1a1a; border-radius: 12px; padding: 14px; margin-bottom: 20px; }
-    .address-title { font-size: 11px; color: #888; margin-bottom: 6px; }
-    .address-text { font-size: 11px; font-family: monospace; color: #ccc; word-break: break-all; }
-    .copy-link { display: block; text-align: center; margin-top: 8px; color: #60a5fa; font-size: 12px; cursor: pointer; text-decoration: underline; }
+    /* ── Details card ── */
+    .details-card {
+      background: #111; border: 1px solid #1e1e1e; border-radius: 14px;
+      padding: 14px 16px; margin-bottom: 16px;
+    }
+    .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+    .detail-row + .detail-row { border-top: 1px solid #1a1a1a; }
+    .detail-label { font-size: 12px; color: #555; }
+    .detail-value { font-size: 12px; color: #ccc; font-family: monospace; font-weight: 500; }
+    .status-pill {
+      background: rgba(0,196,140,0.12); color: #00c48c;
+      border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+    }
+    .status-pill.expired { background: rgba(239,68,68,0.12); color: #ef4444; }
 
+    /* ── Address box ── */
+    .address-box {
+      background: #111; border: 1px solid #1e1e1e; border-radius: 14px;
+      padding: 14px 16px; margin-bottom: 20px;
+    }
+    .address-label { font-size: 10px; color: #555; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 8px; }
+    .address-text { font-size: 11px; font-family: monospace; color: #888; word-break: break-all; line-height: 1.5; margin-bottom: 10px; }
+    .copy-btn {
+      width: 100%; padding: 11px; border: 1.5px solid #2a2a2a; border-radius: 10px;
+      background: #1a1a1a; color: #60a5fa; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.18s;
+    }
+    .copy-btn:hover { border-color: #60a5fa; background: rgba(96,165,250,0.08); }
+    .copy-btn.copied { border-color: #00c48c; color: #00c48c; background: rgba(0,196,140,0.08); }
+
+    /* ── Payment buttons ── */
+    .pay-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
     .btn-paypal {
-      width: 100%; padding: 14px; border: none; border-radius: 12px;
-      background: #fff; color: #000; font-size: 15px; font-weight: 600;
-      cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .btn-venmo {
-      width: 100%; padding: 14px; border: none; border-radius: 12px;
-      background: #3d95ce; color: #fff; font-size: 15px; font-weight: 600;
+      width: 100%; padding: 15px; border: none; border-radius: 14px;
+      background: #1c2333; color: #fff; font-size: 15px; font-weight: 700;
       cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      border: 1.5px solid #003087; transition: all 0.18s;
     }
-    .btn-paypal:disabled, .btn-venmo:disabled { opacity: 0.4; cursor: not-allowed; }
-    .expired-msg { text-align: center; color: #ef4444; font-size: 13px; margin-bottom: 12px; }
+    .btn-paypal:hover { background: #1e2d4a; }
+    .btn-venmo {
+      width: 100%; padding: 15px; border: none; border-radius: 14px;
+      background: #0e2233; color: #fff; font-size: 15px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      border: 1.5px solid #3d95ce; transition: all 0.18s;
+    }
+    .btn-venmo:hover { background: #112840; }
+    .btn-paypal:disabled, .btn-venmo:disabled { opacity: 0.35; cursor: not-allowed; }
 
-    .loading { text-align: center; padding: 60px 20px; color: #888; }
+    /* ── Expired overlay ── */
+    .expired-banner {
+      text-align: center; color: #ef4444; font-size: 13px; font-weight: 600;
+      padding: 12px; background: rgba(239,68,68,0.08); border-radius: 10px;
+      border: 1px solid rgba(239,68,68,0.2); margin-bottom: 12px; display: none;
+    }
+
+    /* ── Loading ── */
+    .loading { text-align: center; padding: 80px 20px; color: #444; font-size: 14px; }
+
+    /* ── How to Pay Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      display: flex; align-items: flex-end; justify-content: center;
+      z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: #111; border-radius: 24px 24px 0 0; border: 1px solid #1e1e1e;
+      padding: 28px 24px 40px; width: 100%; max-width: 420px;
+      transform: translateY(40px); transition: transform 0.3s ease;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-handle { width: 36px; height: 4px; background: #333; border-radius: 99px; margin: 0 auto 20px; }
+    .modal h2 { font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+    .step { display: flex; gap: 14px; margin-bottom: 18px; }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%; background: #1a1a1a;
+      border: 1.5px solid #2a2a2a; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #888; flex-shrink: 0; margin-top: 1px;
+    }
+    .step-body { flex: 1; }
+    .step-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .step-desc { font-size: 12px; color: #666; line-height: 1.5; }
+    .step-desc b { color: #aaa; }
+    .modal-close {
+      width: 100%; padding: 14px; border: none; border-radius: 14px;
+      background: #1a1a1a; color: #888; font-size: 14px; font-weight: 600;
+      cursor: pointer; margin-top: 6px;
+    }
+    .modal-close:hover { background: #222; color: #fff; }
   </style>
 </head>
 <body>
-<div class="container">
-  <div class="topbar">
-    <button class="back-btn" onclick="history.back()">← Back</button>
-    <div class="page-title">Invoice</div>
-  </div>
 
-  <div id="loading" class="loading">Loading invoice...</div>
-  <div id="content" style="display:none">
+<!-- How to Pay Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>💡 How to Pay</h2>
 
-    <div class="amount-section">
-      <div class="amount" id="inv-amount">$0.00</div>
-      <div class="status-badge"><span class="dot"></span><span id="inv-status">AWAITING PAYMENT</span></div>
-    </div>
-
-    <div class="timer">Expires in <span id="countdown">60:00</span></div>
-
-    <div class="qr-wrapper">
-      <div id="qrcode"></div>
-      <div class="qr-logo">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png" alt="PYUSD" />
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Copy the PYUSD address</div>
+        <div class="step-desc">Tap <b>"Copy Address"</b> button below the QR code on this page.</div>
       </div>
     </div>
 
-    <div class="details">
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Open PayPal or Venmo</div>
+        <div class="step-desc">Tap the <b>"Go to PayPal"</b> or <b>"Go to Venmo"</b> button to open the app.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Check your PYUSD balance</div>
+        <div class="step-desc">Go to your <b>Crypto</b> section. If your PYUSD balance is <b>$0</b>, first buy PYUSD or convert from your existing balance.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Send to the copied address</div>
+        <div class="step-desc">Select <b>Send PYUSD → External Wallet</b>, paste the copied address, enter the exact amount <span id="modal-amount"></span>, and confirm.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Wait for confirmation</div>
+        <div class="step-desc">Payment will be confirmed automatically. You have <b>1 hour</b> before this invoice expires.</div>
+      </div>
+    </div>
+
+    <button class="modal-close" onclick="closeModal()">Got it ✓</button>
+  </div>
+</div>
+
+<!-- Main page -->
+<div class="container">
+  <div class="topbar">
+    <button class="back-btn" onclick="history.back()">← Back</button>
+    <button class="how-btn" onclick="openModal()">💡 How to pay</button>
+  </div>
+
+  <div id="loading" class="loading">Loading invoice...</div>
+
+  <div id="content" style="display:none">
+
+    <div class="amount-section">
+      <div class="amount-label">Amount Due</div>
+      <div class="amount" id="inv-amount">$0.00</div>
+      <div class="scan-hint">Scan or tap to pay</div>
+    </div>
+
+    <!-- QR Code -->
+    <div class="qr-section">
+      <div class="qr-outer">
+        <div id="qrcode"></div>
+        <div class="qr-logo">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/PayPal_PYUSD_Logo.svg/512px-PayPal_PYUSD_Logo.svg.png"
+            onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png'"
+            alt="PYUSD"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Timer -->
+    <div class="timer-box">
+      <div class="timer-label">Time Remaining</div>
+      <div class="timer-value" id="countdown">60 : 00</div>
+    </div>
+
+    <!-- Details -->
+    <div class="details-card">
       <div class="detail-row">
         <span class="detail-label">Reference</span>
         <span class="detail-value" id="inv-code">—</span>
@@ -103,33 +244,36 @@
         <span class="detail-value" id="inv-network">—</span>
       </div>
       <div class="detail-row">
-        <span class="detail-label">Asset</span>
-        <span class="detail-value" id="inv-asset">PYUSD</span>
+        <span class="detail-label">Status</span>
+        <span class="status-pill" id="inv-status">AWAITING PAYMENT</span>
       </div>
     </div>
 
+    <!-- Address -->
     <div class="address-box">
-      <div class="address-title">PYUSD Deposit Address</div>
+      <div class="address-label">First copy external PYUSD address</div>
       <div class="address-text" id="inv-address">—</div>
-      <span class="copy-link" onclick="copyAddress()">Copy Invoice Address</span>
+      <button class="copy-btn" id="copyBtn" onclick="copyAddress()">⎘ Copy Address</button>
     </div>
 
-    <div id="expired-msg" class="expired-msg" style="display:none">⚠️ Invoice expired</div>
+    <!-- Expired banner -->
+    <div class="expired-banner" id="expired-banner">⚠️ This invoice has expired</div>
 
-    <button class="btn-paypal" id="btn-paypal" onclick="payWithPayPal()">
-      🅿️ Pay with PayPal
-    </button>
-    <button class="btn-venmo" id="btn-venmo" onclick="payWithVenmo()">
-      💙 Pay with Venmo
-    </button>
-  </div>
-</div>
+    <!-- Pay buttons -->
+    <div class="pay-buttons">
+      <button class="btn-paypal" id="btn-paypal" onclick="goToPayPal()">
+        🅿️ Go to your PayPal
+      </button>
+      <button class="btn-venmo" id="btn-venmo" onclick="goToVenmo()">
+        💙 Go to your Venmo
+      </button>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /container -->
 
 <script>
-  // ── CONFIG: replace these with your actual values ──
   const EDGE_URL = "https://dkmgvtfkffovimoupnwe.supabase.co/functions/v1";
-  const VENMO_USERNAME = "YourVenmoUsername"; // ← তোমার Venmo username দাও
-  const PAYPAL_USERNAME = "YourPayPalUsername"; // ← তোমার PayPal.me username দাও
 
   let invoice = null;
   let timerInterval = null;
@@ -137,6 +281,7 @@
   const params = new URLSearchParams(window.location.search);
   const invoiceId = params.get("id");
 
+  // ── Load invoice ──────────────────────────────────────────
   async function loadInvoice() {
     if (!invoiceId) {
       document.getElementById("loading").textContent = "Invalid invoice link.";
@@ -152,68 +297,104 @@
     }
   }
 
+  // ── Render ────────────────────────────────────────────────
   function renderInvoice() {
     document.getElementById("loading").style.display = "none";
     document.getElementById("content").style.display = "block";
 
-    document.getElementById("inv-amount").textContent = `$${Number(invoice.amount_usd).toFixed(2)}`;
+    const amount = Number(invoice.amount_usd).toFixed(2);
+    document.getElementById("inv-amount").textContent = `$${amount}`;
+    document.getElementById("modal-amount").textContent = `($${amount} PYUSD)`;
     document.getElementById("inv-code").textContent = invoice.invoice_code;
     document.getElementById("inv-network").textContent =
       invoice.network.charAt(0).toUpperCase() + invoice.network.slice(1);
-    document.getElementById("inv-asset").textContent = invoice.asset;
-    document.getElementById("inv-address").textContent =
-      invoice.wallet_address || invoice.deposit_address || "—";
 
-    const qrTarget = invoice.wallet_address || invoice.deposit_address || "unknown";
-    new QRCode(document.getElementById("qrcode"), {
-      text: qrTarget,
-      width: 200, height: 200,
-      colorDark: "#000000", colorLight: "#ffffff",
-      correctLevel: QRCode.CorrectLevel.H
-    });
+    const addr = invoice.wallet_address || invoice.deposit_address || "";
+    document.getElementById("inv-address").textContent = addr || "—";
+
+    // QR code
+    if (addr) {
+      new QRCode(document.getElementById("qrcode"), {
+        text: addr,
+        width: 200,
+        height: 200,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
 
     startTimer();
   }
 
+  // ── Countdown timer ───────────────────────────────────────
   function startTimer() {
     const expiresAt = new Date(invoice.expires_at).getTime();
+
     function tick() {
       const diff = expiresAt - Date.now();
       if (diff <= 0) {
-        document.getElementById("countdown").textContent = "00:00";
-        document.getElementById("expired-msg").style.display = "block";
+        document.getElementById("countdown").textContent = "00 : 00";
+        document.getElementById("countdown").classList.add("urgent");
+        document.getElementById("expired-banner").style.display = "block";
         document.getElementById("btn-paypal").disabled = true;
         document.getElementById("btn-venmo").disabled = true;
         document.getElementById("inv-status").textContent = "EXPIRED";
+        document.getElementById("inv-status").classList.add("expired");
         clearInterval(timerInterval);
         return;
       }
+      // Red color when under 5 minutes
+      if (diff < 5 * 60 * 1000) {
+        document.getElementById("countdown").classList.add("urgent");
+      }
       const m = String(Math.floor(diff / 60000)).padStart(2, "0");
       const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
-      document.getElementById("countdown").textContent = `${m}:${s}`;
+      document.getElementById("countdown").textContent = `${m} : ${s}`;
     }
     tick();
     timerInterval = setInterval(tick, 1000);
   }
 
+  // ── Copy address ──────────────────────────────────────────
   function copyAddress() {
     const addr = invoice?.wallet_address || invoice?.deposit_address;
     if (!addr) return;
-    navigator.clipboard.writeText(addr).then(() => alert("Address copied!"));
+    navigator.clipboard.writeText(addr).then(() => {
+      const btn = document.getElementById("copyBtn");
+      btn.textContent = "✓ Copied!";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.textContent = "⎘ Copy Address";
+        btn.classList.remove("copied");
+      }, 2500);
+    });
   }
 
-  function payWithPayPal() {
-    const paypalLink = `https://www.paypal.com/paypalme/${PAYPAL_USERNAME}/${Number(invoice.amount_usd).toFixed(2)}USD`;
-    window.location.href = paypalLink;
+  // ── PayPal / Venmo — just open the app ───────────────────
+  function goToPayPal() {
+    // Opens PayPal app or website — user sends PYUSD manually
+    window.open("https://www.paypal.com/myaccount/crypto", "_blank");
   }
 
-  function payWithVenmo() {
-    const amount = Number(invoice.amount_usd).toFixed(2);
-    const note = encodeURIComponent(`Invoice ${invoice.invoice_code}`);
-    const url = `https://venmo.com/${VENMO_USERNAME}?txn=pay&amount=${amount}&note=${note}&audience=private`;
-    window.location.href = url;
+  function goToVenmo() {
+    // Opens Venmo app or website — user sends PYUSD manually
+    window.open("https://venmo.com/account/pay", "_blank");
   }
 
+  // ── How to Pay modal ──────────────────────────────────────
+  function openModal() {
+    document.getElementById("modalOverlay").classList.add("open");
+  }
+
+  function closeModal(e) {
+    // Close if clicking overlay background or close button
+    if (!e || e.target === document.getElementById("modalOverlay")) {
+      document.getElementById("modalOverlay").classList.remove("open");
+    }
+  }
+
+  // ── Init ──────────────────────────────────────────────────
   loadInvoice();
 </script>
 </body>
