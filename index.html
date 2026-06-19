@@ -138,29 +138,6 @@
     }
     .show-more:hover { color: #888; }
 
-    .email-wrap {
-      display: flex;
-      align-items: center;
-      background: #1a1a1a;
-      border: 1.5px solid #222;
-      border-radius: 14px;
-      padding: 0 14px;
-      margin-bottom: 14px;
-      transition: border-color 0.2s;
-    }
-    .email-wrap:focus-within { border-color: #009cde; }
-    .email-icon { color: #555; margin-right: 8px; font-size: 16px; }
-    .email-input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #fff;
-      font-size: 15px;
-      padding: 14px 0;
-      width: 100%;
-    }
-    .email-input::placeholder { color: #555; }
-
     .custom-wrap {
       position: relative; margin-bottom: 20px;
     }
@@ -301,18 +278,6 @@
       placeholder="Custom amount"
       aria-label="Custom amount"
       aria-valuemin="1"
-    />
-  </div>
-
-  <div class="email-wrap">
-    <span class="email-icon">&#9993;</span>
-    <input
-      class="email-input"
-      id="recipientEmail"
-      type="email"
-      placeholder="Your email address"
-      autocomplete="email"
-      required
     />
   </div>
 
