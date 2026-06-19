@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
 
 
     // Persist invoice to Supabase
-    const dbRes = await fetch(`${SUPABASE_URL}/rest/v1/invoice-create`, {
+    const dbRes = await fetch(`${SUPABASE_URL}/rest/v1/invoices`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
