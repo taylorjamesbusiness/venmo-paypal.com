@@ -69,7 +69,7 @@
       color: #555; text-transform: uppercase; margin-bottom: 8px;
     }
 
-    .network-row { display: flex; gap: 8px; margin-bottom: 20px; }
+      .network-row { display: flex; gap: 8px; margin-bottom: 20px; }
 
     .net-btn {
       flex: 1; padding: 9px 4px;
@@ -247,11 +247,10 @@
       />
     </div>
 
-    <button class="pay-btn btn-paypal" id="btnPaypal" disabled>
+        <button class="pay-btn btn-paypal" id="btnPaypal" disabled>
       <span class="btn-logo">
         <img
-          src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg"
-          onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png'"
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/PayPal_logo_2012.svg/640px-PayPal_logo_2012.svg.png"
           alt="PP" style="width:20px;height:auto;display:block;">
       </span>
       Pay with PayPal
@@ -262,8 +261,7 @@
     <button class="pay-btn btn-venmo" id="btnVenmo" disabled>
       <span class="btn-logo">
         <img
-          src="https://venmo.com/assets/img/venmo-logo-icon-blue.png"
-          onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Venmo_logo.svg/2560px-Venmo_logo.svg.png'"
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Venmo_logo.svg/2560px-Venmo_logo.svg.png"
           alt="V" style="width:18px;height:auto;display:block;">
       </span>
       Pay with Venmo
@@ -278,6 +276,12 @@
     const API_URL = "https://dkmgvtfkffovimoupnwe.supabase.co/functions/v1/invoice-create";
     let selectedNetwork = "solana";
     let selectedAmount = null;
+
+    const PAYPAL_BTN_HTML = '<span class="btn-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/PayPal_logo_2012.svg/640px-PayPal_logo_2012.svg.png" alt="PP" style="width:20px;height:auto;display:block;"></span> Pay with PayPal';
+    const VENMO_BTN_HTML = '<span class="btn-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Venmo_logo.svg/2560px-Venmo_logo.svg.png" alt="V" style="width:18px;height:auto;display:block;"></span> Pay with Venmo';
+
+    const btnPaypal = document.getElementById("btnPaypal");
+    const btnVenmo = document.getElementById("btnVenmo");
 
     document.querySelectorAll(".net-btn").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -312,8 +316,8 @@
 
     function updatePayButtons() {
       const valid = selectedAmount && selectedAmount >= 1 && selectedAmount <= 2000;
-      document.getElementById("btnPaypal").disabled = !valid;
-      document.getElementById("btnVenmo").disabled = !valid;
+      btnPaypal.disabled = !valid;
+      btnVenmo.disabled = !valid;
     }
 
     function showToast(msg, type = "") {
@@ -323,13 +327,20 @@
       setTimeout(() => { t.className = "toast"; }, 3200);
     }
 
+    function resetButtons() {
+      btnPaypal.disabled = false;
+      btnVenmo.disabled = false;
+      btnPaypal.innerHTML = PAYPAL_BTN_HTML;
+      btnVenmo.innerHTML = VENMO_BTN_HTML;
+      updatePayButtons();
+    }
+
     async function createInvoice(via) {
-      const btnPaypal = document.getElementById("btnPaypal");
-      const btnVenmo = document.getElementById("btnVenmo");
       btnPaypal.disabled = true;
       btnVenmo.disabled = true;
-      btnPaypal.innerHTML = 'Creating...';
-      btnVenmo.innerHTML = 'Creating...';
+      btnPaypal.innerHTML = "Creating...";
+      btnVenmo.innerHTML = "Creating...";
+
       try {
         const res = await fetch(API_URL, {
           method: "POST",
@@ -342,26 +353,23 @@
             note: via === "paypal" ? "PayPal PYUSD" : "Venmo PYUSD"
           }),
         });
+
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Invoice creation failed");
+
         const invoiceId = data.invoice_id || data.id;
-        if (invoiceId) {
-          window.location.href = `invoice.html?id=${invoiceId}`;
-        } else {
-          throw new Error("No invoice ID returned");
-        }
+        if (!invoiceId) throw new Error("No invoice ID returned");
+
+        window.location.replace(`invoice.html?id=${invoiceId}`);
+
       } catch (e) {
         showToast(e.message || "Invoice creation failed", "error");
-        btnPaypal.disabled = false;
-        btnVenmo.disabled = false;
-        btnPaypal.innerHTML = '<span class="btn-logo"><img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" onerror="this.src=\'https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png\'" alt="PP" style="width:20px;height:auto;display:block;"></span> Pay with PayPal';
-        btnVenmo.innerHTML = '<span class="btn-logo"><img src="https://venmo.com/assets/img/venmo-logo-icon-blue.png" onerror="this.src=\'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Venmo_logo.svg/2560px-Venmo_logo.svg.png\'" alt="V" style="width:18px;height:auto;display:block;"></span> Pay with Venmo';
-        updatePayButtons();
+        resetButtons();
       }
     }
 
-    document.getElementById("btnPaypal").addEventListener("click", () => createInvoice("paypal"));
-    document.getElementById("btnVenmo").addEventListener("click", () => createInvoice("venmo"));
+    btnPaypal.addEventListener("click", () => createInvoice("paypal"));
+    btnVenmo.addEventListener("click", () => createInvoice("venmo"));
   </script>
 </body>
 </html>
