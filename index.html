@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pay Rose | Premium Crypto Checkout</title>
 
-    <!-- PYUSD favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230066CC'/><text x='50' y='62' font-size='52' font-weight='900' font-family='Arial,sans-serif' text-anchor='middle' fill='white'>%24</text></svg>">
 
     <style>
@@ -20,6 +19,7 @@
             --text-dim: #555;
             --border: rgba(255,255,255,0.07);
             --accent-pill: linear-gradient(135deg, #1BFF9E, #00D1FF);
+            --secure-green: #14F195;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,7 +33,7 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--text);
             padding: 10px 12px 12px;
-            overflow-x: hidden;   /* pull-to-refresh OK */
+            overflow-x: hidden;
         }
 
         body::before {
@@ -50,39 +50,68 @@
 
         .wrapper {
             width: 100%;
-            max-width: 380px;         /* সামান্য স্লিম */
+            max-width: 380px;
             display: flex;
             flex-direction: column;
             gap: 16px;
             position: relative;
             z-index: 1;
-            /* translateY হटा দিলাম – default position */
         }
 
         /* ===== HEADER ===== */
-        .header { text-align: center; padding-top: 0; }
+        .header { text-align: center; padding-top: 2px; }
         .brand {
-            font-size: 28px;          /* একটু ছোট */
-            font-weight: 900;
+            font-size: 28px; font-weight: 900;
             display: flex; align-items: center; justify-content: center;
-            gap: 8px; margin-bottom: 4px; letter-spacing: -0.4px;
+            gap: 8px; margin-bottom: 10px; letter-spacing: -0.4px;
         }
         .verified-icon { width: 20px; height: 20px; animation: verifiedPop 3s ease-in-out infinite; }
         @keyframes verifiedPop {
             0%,100% { filter: drop-shadow(0 0 3px var(--verified)) brightness(1); transform: scale(1); }
             50% { filter: drop-shadow(0 0 8px var(--verified)) brightness(1.2); transform: scale(1.05); }
         }
-        .tagline {
-            font-size: 9px; color: var(--text-dim); font-weight: 700;
-            letter-spacing: 2.3px; text-transform: uppercase;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
+
+        /* Premium Secure Payment pill */
+        .secure-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 18px;
+            border-radius: 999px;
+            border: 1.5px solid rgba(20,241,149,0.35);
+            background: rgba(20,241,149,0.05);
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--secure-green);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            animation: pillPulse 3s ease-in-out infinite;
         }
-        .tagline-dot {
-            width: 4px; height: 4px; border-radius: 50%;
-            background: var(--solana); display: inline-block;
-            animation: blink 2s ease-in-out infinite;
-            box-shadow: 0 0 5px var(--solana);
+        .secure-pill::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 999px;
+            background: linear-gradient(90deg, transparent, rgba(20,241,149,0.08), transparent);
+            transform: translateX(-100%);
+            animation: pillShimmer 3s ease-in-out infinite 0.5s;
         }
+        @keyframes pillShimmer {
+            0% { transform: translateX(-100%); }
+            50%,100% { transform: translateX(100%); }
+        }
+        @keyframes pillPulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(20,241,149,0.0), inset 0 0 0 0 rgba(20,241,149,0); border-color: rgba(20,241,149,0.3); }
+            50% { box-shadow: 0 0 18px rgba(20,241,149,0.18); border-color: rgba(20,241,149,0.6); }
+        }
+        .secure-pill svg { flex-shrink: 0; animation: shieldBeat 3s ease-in-out infinite; }
+        @keyframes shieldBeat {
+            0%,100% { filter: drop-shadow(0 0 2px rgba(20,241,149,0.5)); }
+            50% { filter: drop-shadow(0 0 7px rgba(20,241,149,0.9)); }
+        }
+
         @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
         /* ===== CARD ===== */
@@ -124,61 +153,36 @@
         @keyframes ppGlow { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
         .card-logo-img { height: 18px; width: auto; position: relative; z-index: 1; }
 
-        .venmo-brand {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
+        .venmo-brand { display: inline-flex; align-items: center; gap: 5px; }
         .venmo-fake-logo {
-            width: 20px;
-            height: 20px;
-            border-radius: 999px;
+            width: 20px; height: 20px; border-radius: 999px;
             background: linear-gradient(135deg, #00A8FF, #006DFF);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow:
-                0 0 0 1px rgba(255,255,255,0.06),
-                0 0 10px rgba(0,140,255,0.55);
-            position: relative;
-            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 0 10px rgba(0,140,255,0.55);
+            position: relative; overflow: hidden;
         }
         .venmo-fake-logo::before {
-            content: '';
-            position: absolute;
-            inset: 2px;
-            border-radius: 999px;
+            content: ''; position: absolute; inset: 2px; border-radius: 999px;
             border: 1px solid rgba(255,255,255,0.18);
         }
         .venmo-fake-v {
-            font-size: 12px;
-            font-weight: 900;
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-            color: #fff;
-            letter-spacing: 0.4px;
+            font-size: 12px; font-weight: 900;
+            font-family: 'Inter', system-ui, sans-serif;
+            color: #fff; letter-spacing: 0.4px;
         }
         .venmo-text-top {
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: lowercase;
-            color: #e5f4ff;
-            letter-spacing: 0.2px;
-            position: relative;
+            font-size: 12px; font-weight: 800; text-transform: lowercase;
+            color: #e5f4ff; letter-spacing: 0.2px; position: relative;
         }
         .venmo-text-top::after {
-            content: '';
-            position: absolute;
-            left: 0; bottom: -1px;
+            content: ''; position: absolute; left: 0; bottom: -1px;
             width: 100%; height: 1px;
             background: linear-gradient(90deg, rgba(255,255,255,0.0), rgba(255,255,255,0.65), rgba(255,255,255,0.0));
-            transform-origin: left;
-            transform: scaleX(0);
+            transform-origin: left; transform: scaleX(0);
             animation: venmoUnderline 3s ease-in-out infinite 0.4s;
         }
         @keyframes venmoUnderline {
-            0%,40% { transform: scaleX(0); }
-            55%,80% { transform: scaleX(1); }
-            100% { transform: scaleX(0); }
+            0%,40% { transform: scaleX(0); } 55%,80% { transform: scaleX(1); } 100% { transform: scaleX(0); }
         }
 
         .solana-tag {
@@ -190,7 +194,7 @@
             animation: solanaPulse 4s ease-in-out infinite;
         }
         @keyframes solanaPulse {
-            0%,100% { box-shadow: 0 0 7px rgba(20,241,149,0.08); border-color: rgba(20,241,149,0.25); }
+            0%,100% { border-color: rgba(20,241,149,0.25); }
             50% { box-shadow: 0 0 16px rgba(20,241,149,0.22); border-color: rgba(20,241,149,0.5); }
         }
         .solana-tag span { font-size: 9px; font-weight: 800; color: #14F195; letter-spacing: 1px; }
@@ -200,7 +204,7 @@
             font-size: 9px; color: #444; text-transform: uppercase;
             letter-spacing: 2px; margin-bottom: 10px; font-weight: 600;
         }
-        .pyusd-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .pyusd-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
 
         .pyusd-logo-wrap {
             width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
@@ -222,12 +226,13 @@
         .pyusd-name { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
         .pyusd-sub { font-size: 9px; color: #555; font-weight: 600; letter-spacing: 0.5px; }
 
+        /* Network badge */
         .network-badge {
             padding: 7px 12px;
             background: rgba(20,241,149,0.03);
             border: 1px solid rgba(20,241,149,0.1);
             border-radius: 12px;
-            display: flex; align-items: center; gap: 7px;
+            display: flex; align-items: center; gap: 6px;
             font-size: 10px; color: #555; font-weight: 600;
         }
         .network-badge-dot {
@@ -235,6 +240,7 @@
             background: var(--solana); box-shadow: 0 0 5px var(--solana);
             animation: blink 2s ease-in-out infinite; flex-shrink: 0;
         }
+        .network-badge .net-label { color: #888; font-weight: 700; }
         .network-badge .sol-label { color: #14F195; font-weight: 700; }
         .network-badge .sep { color: #333; }
 
@@ -259,18 +265,17 @@
             border-radius: 13px; padding: 12px 0;
             color: #aaa; font-size: 16px; font-weight: 700;
             cursor: pointer; transition: all 0.2s cubic-bezier(.4,0,.2,1);
-            font-family: inherit; position: relative; overflow: hidden;
+            font-family: inherit;
         }
         .amt-btn:hover { color: #fff; border-color: rgba(255,255,255,0.15); transform: translateY(-1px); }
         .amt-btn.active {
             background: var(--accent-pill);
-            color: #02140d;
-            border-color: transparent;
-            box-shadow: 0 4px 18px rgba(0, 240, 180, 0.35);
+            color: #02140d; border-color: transparent;
+            box-shadow: 0 4px 18px rgba(0,240,180,0.35);
             transform: translateY(-2px);
         }
 
-        .custom-wrap { position: relative; margin-top: 2px; }
+        .custom-wrap { position: relative; }
         .custom-wrap .dollar {
             position: absolute; left: 14px; top: 50%;
             transform: translateY(-50%); color: #444; font-weight: 700; font-size: 15px;
@@ -321,22 +326,9 @@
         }
         .btn-vm:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,140,255,0.45); }
 
-        .btn-logo-only {
-            height: 22px;
-            width: auto;
-        }
-
-        .venmo-btn-content {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-        }
-        .venmo-text-btn {
-            font-size: 14px;
-            font-weight: 800;
-            text-transform: lowercase;
-            letter-spacing: 0.3px;
-        }
+        .btn-logo-only { height: 22px; width: auto; }
+        .venmo-btn-content { display: inline-flex; align-items: center; gap: 7px; }
+        .venmo-text-btn { font-size: 14px; font-weight: 800; text-transform: lowercase; letter-spacing: 0.3px; }
 
         .btn.loading::before {
             content: ''; position: absolute;
@@ -345,10 +337,7 @@
             border-top-color: currentColor; border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
-        .btn.loading img,
-        .btn.loading .venmo-btn-content {
-            opacity: 0;
-        }
+        .btn.loading img, .btn.loading .venmo-btn-content { opacity: 0; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .footer {
@@ -365,16 +354,22 @@
     <div class="header">
         <div class="brand">
             Pay Rose
-            <svg class="verified-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg class="verified-icon" viewBox="0 0 24 24" fill="none">
                 <path d="M12 2L13.8 5.3L17.5 4L17.2 7.9L21 9L19.2 12.3L21 15.6L17.2 16.7L17.5 20.6L13.8 19.3L12 22.6L10.2 19.3L6.5 20.6L6.8 16.7L3 15.6L4.8 12.3L3 9L6.8 7.9L6.5 4L10.2 5.3L12 2Z" fill="#0095f6"/>
                 <path d="M8.5 12.5L11 15L15.5 10" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </div>
-        <p class="tagline">
-            <span class="tagline-dot"></span>
-            Verified Crypto Checkout
-            <span class="tagline-dot"></span>
-        </p>
+
+        <!-- Premium Secure Payment pill badge -->
+        <div class="secure-pill">
+            <!-- Shield + checkmark icon -->
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11.35C16.5 22.15 20 17.25 20 12V6l-8-4z"
+                      fill="rgba(20,241,149,0.15)" stroke="#14F195" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M9 12l2.5 2.5L15 9" stroke="#14F195" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Secure Payment
+        </div>
     </div>
 
     <!-- Card -->
@@ -386,9 +381,7 @@
                          class="card-logo-img" alt="PayPal">
                 </div>
                 <div class="venmo-brand">
-                    <div class="venmo-fake-logo">
-                        <span class="venmo-fake-v">V</span>
-                    </div>
+                    <div class="venmo-fake-logo"><span class="venmo-fake-v">V</span></div>
                     <span class="venmo-text-top">venmo</span>
                 </div>
             </div>
@@ -413,7 +406,7 @@
             <h4>Asset Support</h4>
             <div class="pyusd-row">
                 <div class="pyusd-logo-wrap">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                         <circle cx="12" cy="12" r="11" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
                         <text x="6.5" y="16.5" font-size="13" font-weight="900"
                               font-family="Arial,Helvetica,sans-serif" fill="white">P</text>
@@ -427,8 +420,11 @@
                 </div>
             </div>
 
+            <!-- Network badge: Network · [sol logo] Solana Mainnet · Fast · <$0.01 fee -->
             <div class="network-badge">
                 <div class="network-badge-dot"></div>
+                <span class="net-label">Network</span>
+                <span class="sep">·</span>
                 <svg width="11" height="11" viewBox="0 0 397 311" style="flex-shrink:0">
                     <defs>
                         <linearGradient id="sg2" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -472,12 +468,9 @@
             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
                  class="btn-logo-only" alt="PayPal">
         </button>
-
         <button class="btn btn-vm" id="btnVM" disabled>
             <span class="venmo-btn-content">
-                <div class="venmo-fake-logo">
-                    <span class="venmo-fake-v">V</span>
-                </div>
+                <div class="venmo-fake-logo"><span class="venmo-fake-v">V</span></div>
                 <span class="venmo-text-btn">venmo</span>
             </span>
         </button>
@@ -530,11 +523,8 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    asset: "PYUSD",
-                    network: "solana",
-                    amount_usd: amount,
-                    amount: String(amount),
-                    note: via
+                    asset: "PYUSD", network: "solana",
+                    amount_usd: amount, amount: String(amount), note: via
                 })
             });
             const d = await r.json();
