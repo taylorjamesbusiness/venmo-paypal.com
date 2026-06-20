@@ -3,30 +3,56 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pay Rose | Premium Payment</title>
+    <title>Pay Rose | Premium Crypto Checkout</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%2314F195'/><text y='.9em' font-size='65' x='18' fill='black'>₿</text></svg>">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+
         :root {
-            --bg: #000;
-            --card: #121212;
-            --accent: #00D64F;
+            --bg: #050508;
+            --card: #0e0e14;
+            --card2: #111118;
+            --solana: #14F195;
+            --solana2: #9945FF;
             --paypal: #0070ba;
             --venmo: #008CFF;
             --verified: #0095f6;
             --text: #fff;
-            --text-dim: #777;
+            --text-dim: #555;
+            --border: rgba(255,255,255,0.07);
+            --pyusd: #0066cc;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        
+
         body {
             min-height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
             background: var(--bg);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--text);
             padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Background glow */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -30%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(ellipse, rgba(20,241,149,0.04) 0%, transparent 70%);
+            pointer-events: none;
+            animation: bgPulse 8s ease-in-out infinite;
+        }
+        @keyframes bgPulse {
+            0%,100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
         .wrapper {
@@ -34,178 +60,450 @@
             max-width: 400px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* Header & Verified Badge */
-        .header { text-align: center; }
+        /* ===== HEADER ===== */
+        .header { text-align: center; padding: 8px 0; }
         .brand {
-            font-size: 28px;
-            font-weight: 800;
+            font-size: 30px;
+            font-weight: 900;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            margin-bottom: 4px;
+            gap: 10px;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
         }
         .verified-icon {
-            width: 20px;
-            height: 20px;
-            filter: drop-shadow(0 0 4px rgba(0, 149, 246, 0.4));
-            animation: glow 3s infinite ease-in-out;
+            width: 22px; height: 22px;
+            animation: verifiedPop 3s ease-in-out infinite;
         }
-        @keyframes glow {
-            0%, 100% { filter: drop-shadow(0 0 2px var(--verified)); }
-            50% { filter: drop-shadow(0 0 8px var(--verified)); }
+        @keyframes verifiedPop {
+            0%,100% { filter: drop-shadow(0 0 3px var(--verified)) brightness(1); transform: scale(1); }
+            50% { filter: drop-shadow(0 0 10px var(--verified)) brightness(1.3); transform: scale(1.1); }
         }
-        .tagline { font-size: 12px; color: var(--text-dim); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .tagline {
+            font-size: 10px;
+            color: var(--text-dim);
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+        .tagline-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--solana);
+            display: inline-block;
+            animation: blink 2s ease-in-out infinite;
+            box-shadow: 0 0 6px var(--solana);
+        }
+        @keyframes blink {
+            0%,100% { opacity: 1; box-shadow: 0 0 6px var(--solana); }
+            50% { opacity: 0.4; box-shadow: none; }
+        }
 
-        /* Premium Card */
+        /* ===== PREMIUM CARD ===== */
         .card {
-            background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
-            border-radius: 30px;
-            padding: 32px;
-            border: 1px solid #222;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            background: linear-gradient(160deg, #141420 0%, #0a0a12 60%, #0d1020 100%);
+            border-radius: 28px;
+            padding: 28px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow:
+                0 0 0 1px rgba(20,241,149,0.04),
+                0 20px 60px rgba(0,0,0,0.7),
+                inset 0 1px 0 rgba(255,255,255,0.06);
             position: relative;
             overflow: hidden;
         }
-        .card::after {
-            content: "";
+        /* Shimmer overlay */
+        .card::before {
+            content: '';
             position: absolute;
-            top: -50%; right: -50%;
-            width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+            top: 0; left: -100%;
+            width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.025), transparent);
+            animation: shimmer 5s ease-in-out infinite 1s;
         }
+        @keyframes shimmer {
+            0% { left: -100%; }
+            40%,100% { left: 150%; }
+        }
+        /* Solana gradient orb */
+        .card::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; right: -60px;
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, rgba(153,69,255,0.08) 0%, rgba(20,241,149,0.04) 40%, transparent 70%);
+            pointer-events: none;
+        }
+
         .card-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
+            position: relative;
+            z-index: 1;
         }
-        .card-logos { display: flex; gap: 16px; align-items: center; }
-        .card-logo-img { height: 22px; width: auto; }
-        
+        .card-logos { display: flex; gap: 14px; align-items: center; }
+
+        /* PayPal logo animated */
+        .paypal-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .paypal-wrap::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 8px;
+            background: radial-gradient(circle, rgba(0,112,186,0.2), transparent);
+            animation: ppGlow 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes ppGlow {
+            0%,100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        .card-logo-img { height: 22px; width: auto; position: relative; z-index: 1; }
+        .venmo-logo { filter: brightness(0) invert(1); opacity: 0.85; }
+
+        /* Solana tag – premium */
         .solana-tag {
-            background: rgba(20, 241, 149, 0.08);
-            border: 1px solid rgba(20, 241, 149, 0.2);
-            padding: 6px 14px;
+            background: linear-gradient(135deg, rgba(20,241,149,0.1) 0%, rgba(153,69,255,0.08) 100%);
+            border: 1px solid rgba(20,241,149,0.25);
+            padding: 7px 14px;
             border-radius: 20px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
+            box-shadow: 0 0 12px rgba(20,241,149,0.08), inset 0 1px 0 rgba(255,255,255,0.06);
+            animation: solanaPulse 4s ease-in-out infinite;
         }
-        .solana-tag span { font-size: 11px; font-weight: 800; color: #14F195; letter-spacing: 0.5px; }
+        @keyframes solanaPulse {
+            0%,100% { box-shadow: 0 0 8px rgba(20,241,149,0.08); border-color: rgba(20,241,149,0.25); }
+            50% { box-shadow: 0 0 18px rgba(20,241,149,0.2); border-color: rgba(20,241,149,0.45); }
+        }
+        .solana-icon { animation: solanaRotate 8s linear infinite; display: flex; }
+        @keyframes solanaRotate {
+            0%,100% { filter: drop-shadow(0 0 3px #14F195); }
+            50% { filter: drop-shadow(0 0 7px #9945FF); }
+        }
+        .solana-tag span { font-size: 10px; font-weight: 800; color: #14F195; letter-spacing: 1px; }
 
-        .card-body h4 { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
-        .card-body p { font-size: 22px; font-weight: 700; }
+        /* Card body – PYUSD */
+        .card-body {
+            position: relative;
+            z-index: 1;
+        }
+        .card-body h4 {
+            font-size: 10px;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .pyusd-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        /* PYUSD Logo */
+        .pyusd-logo {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0066cc, #003d7a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 900;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0,102,204,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+            animation: pyusdGlow 3s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        @keyframes pyusdGlow {
+            0%,100% { box-shadow: 0 0 10px rgba(0,102,204,0.3); }
+            50% { box-shadow: 0 0 22px rgba(0,102,204,0.6); }
+        }
+        .pyusd-info { display: flex; flex-direction: column; gap: 2px; }
+        .pyusd-name { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
+        .pyusd-sub { font-size: 10px; color: #555; font-weight: 600; letter-spacing: 0.5px; }
 
-        /* Selection area */
+        /* Network badge on card */
+        .network-badge {
+            margin-top: 20px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: #444;
+            font-weight: 600;
+        }
+        .network-badge-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--solana);
+            box-shadow: 0 0 6px var(--solana);
+            animation: blink 2s ease-in-out infinite;
+        }
+        .network-badge span { color: #14F195; }
+
+        /* ===== SELECTION ===== */
         .selection {
-            background: #0a0a0a;
+            background: linear-gradient(160deg, #101018, #0c0c14);
             border-radius: 24px;
-            padding: 24px;
-            border: 1px solid #151515;
+            padding: 22px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+        .sel-label {
+            font-size: 10px;
+            color: #444;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 14px;
         }
         .amounts {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 10px;
+            margin-bottom: 14px;
         }
         .amt-btn {
-            background: #151515;
-            border: 1px solid #222;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
             border-radius: 14px;
-            padding: 16px 0;
-            color: #fff;
-            font-size: 18px;
+            padding: 15px 0;
+            color: #aaa;
+            font-size: 17px;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.2s cubic-bezier(.4,0,.2,1);
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
         }
+        .amt-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(20,241,149,0.15), transparent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .amt-btn:hover { color: #fff; border-color: rgba(255,255,255,0.15); transform: translateY(-1px); }
         .amt-btn.active {
-            background: #fff;
+            background: linear-gradient(135deg, #14F195, #0BC97A);
             color: #000;
-            border-color: #fff;
-            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+            border-color: transparent;
+            box-shadow: 0 4px 20px rgba(20,241,149,0.3);
+            transform: translateY(-2px);
         }
+        .amt-btn.active::after { opacity: 0; }
+
         .custom-wrap { position: relative; }
-        .custom-wrap span { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #444; font-weight: 700; }
+        .custom-wrap .dollar {
+            position: absolute; left: 16px; top: 50%;
+            transform: translateY(-50%);
+            color: #444; font-weight: 700; font-size: 16px;
+            pointer-events: none;
+        }
         .custom-input {
             width: 100%;
-            background: #151515;
-            border: 1px solid #222;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
             border-radius: 14px;
-            padding: 16px 16px 16px 32px;
+            padding: 15px 16px 15px 32px;
             color: #fff;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             outline: none;
+            font-family: inherit;
+            transition: all 0.2s;
         }
-        .custom-input:focus { border-color: #444; }
+        .custom-input::placeholder { color: #333; }
+        .custom-input:focus {
+            border-color: rgba(20,241,149,0.3);
+            background: rgba(20,241,149,0.03);
+            box-shadow: 0 0 0 3px rgba(20,241,149,0.06);
+        }
 
-        /* Buttons */
+        /* ===== BUTTONS ===== */
         .btn-list { display: flex; flex-direction: column; gap: 12px; }
         .btn {
             width: 100%;
-            padding: 20px;
-            border-radius: 20px;
+            padding: 19px;
+            border-radius: 18px;
             border: none;
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 800;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            transition: 0.2s;
+            gap: 11px;
+            transition: all 0.25s cubic-bezier(.4,0,.2,1);
+            font-family: inherit;
+            letter-spacing: 0.2px;
+            position: relative;
+            overflow: hidden;
         }
-        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        
-        .btn-pp { background: #fff; color: #000; box-shadow: 0 4px 15px rgba(255,255,255,0.1); }
-        .btn-pp:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,255,255,0.2); }
-        
-        .btn-vm { 
-            background: #008CFF; 
-            color: #fff; 
-            box-shadow: 0 4px 15px rgba(0, 140, 255, 0.2); 
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.4s;
         }
-        .btn-vm:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 140, 255, 0.4); }
+        .btn:hover::after { left: 150%; }
+        .btn:disabled { opacity: 0.25; cursor: not-allowed; transform: none !important; }
+        .btn:disabled::after { display: none; }
 
-        .btn-logo { height: 20px; width: auto; }
+        .btn-pp {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            color: #003087;
+            box-shadow: 0 4px 20px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.8);
+        }
+        .btn-pp:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,255,255,0.2); }
+        .btn-pp:active:not(:disabled) { transform: translateY(0); }
 
-        .footer { text-align: center; font-size: 10px; color: #222; margin-top: 10px; }
+        .btn-vm {
+            background: linear-gradient(135deg, #008CFF 0%, #006ACC 100%);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(0,140,255,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .btn-vm:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,140,255,0.45); }
+        .btn-vm:active:not(:disabled) { transform: translateY(0); }
+
+        .btn-logo { height: 21px; width: auto; }
+
+        /* Loading state */
+        .btn.loading .btn-text { opacity: 0; }
+        .btn.loading::before {
+            content: '';
+            position: absolute;
+            width: 20px; height: 20px;
+            border: 2px solid rgba(0,0,0,0.2);
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            color: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding-bottom: 4px;
+        }
+        .footer svg { flex-shrink: 0; }
     </style>
 </head>
 <body>
     <div class="wrapper">
+
+        <!-- Header -->
         <div class="header">
             <div class="brand">
                 Pay Rose
-                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" class="verified-icon" alt="V">
+                <svg class="verified-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L13.8 5.3L17.5 4L17.2 7.9L21 9L19.2 12.3L21 15.6L17.2 16.7L17.5 20.6L13.8 19.3L12 22.6L10.2 19.3L6.5 20.6L6.8 16.7L3 15.6L4.8 12.3L3 9L6.8 7.9L6.5 4L10.2 5.3L12 2Z" fill="#0095f6"/>
+                    <path d="M8.5 12.5L11 15L15.5 10" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
             </div>
-            <p class="tagline">Secure Crypto Checkout</p>
+            <p class="tagline">
+                <span class="tagline-dot"></span>
+                Verified Crypto Checkout
+                <span class="tagline-dot"></span>
+            </p>
         </div>
 
+        <!-- Premium Card -->
         <div class="card">
             <div class="card-top">
                 <div class="card-logos">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="card-logo-img" alt="PayPal">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Venmo_logo.svg" class="card-logo-img" alt="Venmo" style="filter: brightness(0) invert(1);">
+                    <!-- PayPal animated -->
+                    <div class="paypal-wrap">
+                        <svg class="card-logo-img" height="22" viewBox="0 0 124 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M46.2 6.8H38.4C37.9 6.8 37.4 7.2 37.3 7.7L34.1 27.4C34.0 27.8 34.3 28.1 34.7 28.1H38.4C38.9 28.1 39.4 27.7 39.5 27.2L40.3 22.1C40.4 21.6 40.9 21.2 41.4 21.2H43.9C49.1 21.2 52.1 18.7 52.9 13.8C53.3 11.6 52.9 9.9 51.9 8.7C50.7 7.5 48.8 6.8 46.2 6.8Z" fill="#003087"/>
+                            <path d="M46.2 6.8H38.4C37.9 6.8 37.4 7.2 37.3 7.7L34.1 27.4C34.0 27.8 34.3 28.1 34.7 28.1H38.4C38.9 28.1 39.4 27.7 39.5 27.2L40.3 22.1C40.4 21.6 40.9 21.2 41.4 21.2H43.9C49.1 21.2 52.1 18.7 52.9 13.8C53.3 11.6 52.9 9.9 51.9 8.7C50.7 7.5 48.8 6.8 46.2 6.8Z" fill="#003087"/>
+                        </svg>
+                        <!-- Use actual PayPal SVG wordmark -->
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="card-logo-img" alt="PayPal" style="height:20px;">
+                    </div>
+                    <!-- Venmo -->
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Venmo_logo.svg" class="card-logo-img venmo-logo" alt="Venmo" style="height:18px;">
                 </div>
+
+                <!-- Solana Tag with full text+logo -->
                 <div class="solana-tag">
-                    <svg width="14" height="14" viewBox="0 0 397 311"><path d="M64.6 237.9c2.4 2.4 5.7 3.7 9.2 3.7h314.8c5.8 0 8.7-7 4.6-11.1l-64.6-64.6c-2.4-2.4-5.7-3.7-9.2-3.7H4.6c-5.8 0-8.7 7-4.6 11.1l64.6 64.6zM332.4 73.1c-2.4-2.4-5.7-3.7-9.2-3.7H8.4c-5.8 0-8.7 7-4.6 11.1l64.6 64.6c2.4 2.4 5.7 3.7 9.2 3.7h314.8c5.8 0 8.7-7 4.6-11.1l-64.6-64.6zM332.4 155.5c-2.4-2.4-5.7-3.7-9.2-3.7H8.4c-5.8 0-8.7 7-4.6 11.1l64.6 64.6c2.4 2.4 5.7 3.7 9.2 3.7h314.8c5.8 0 8.7-7 4.6-11.1l-64.6-64.6z" fill="#14F195"/></svg>
+                    <span class="solana-icon">
+                        <svg width="13" height="13" viewBox="0 0 397 311">
+                            <defs>
+                                <linearGradient id="solGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#14F195"/>
+                                    <stop offset="100%" stop-color="#9945FF"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M64.6 237.9c2.4 2.4 5.7 3.7 9.2 3.7h314.8c5.8 0 8.7-7 4.6-11.1l-64.6-64.6c-2.4-2.4-5.7-3.7-9.2-3.7H4.6c-5.8 0-8.7 7-4.6 11.1l64.6 64.6z" fill="url(#solGrad)"/>
+                            <path d="M332.4 73.1c-2.4-2.4-5.7-3.7-9.2-3.7H8.4c-5.8 0-8.7 7-4.6 11.1l64.6 64.6c2.4 2.4 5.7 3.7 9.2 3.7h314.8c5.8 0 8.7-7 4.6-11.1l-64.6-64.6z" fill="url(#solGrad)"/>
+                            <path d="M332.4 155.5c-2.4-2.4-5.7-3.7-9.2-3.7H8.4c-5.8 0-8.7 7-4.6 11.1l64.6 64.6c2.4 2.4 5.7 3.7 9.2 3.7h314.8c5.8 0 8.7-7 4.6-11.1l-64.6-64.6z" fill="url(#solGrad)"/>
+                        </svg>
+                    </span>
                     <span>SOLANA</span>
                 </div>
             </div>
+
+            <!-- PYUSD Row -->
             <div class="card-body">
                 <h4>Asset Support</h4>
-                <p>PYUSD Stablecoin</p>
+                <div class="pyusd-row">
+                    <!-- PYUSD Logo (PayPal's PYUSD) -->
+                    <div class="pyusd-logo">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" fill="#0066cc" opacity="0.3"/>
+                            <text x="5" y="16.5" font-size="11" font-weight="900" fill="white" font-family="Arial">$</text>
+                        </svg>
+                    </div>
+                    <div class="pyusd-info">
+                        <div class="pyusd-name">PYUSD Stablecoin</div>
+                        <div class="pyusd-sub">PayPal USD · 1:1 USD PEG</div>
+                    </div>
+                </div>
+
+                <div class="network-badge">
+                    <div class="network-badge-dot"></div>
+                    Network: <span>Solana Mainnet</span> &nbsp;·&nbsp; Fast · &lt;$0.01 fee
+                </div>
             </div>
         </div>
 
+        <!-- Amount Selection -->
         <div class="selection">
+            <p class="sel-label">Select Amount</p>
             <div class="amounts">
                 <button class="amt-btn" data-amt="10">$10</button>
                 <button class="amt-btn" data-amt="25">$25</button>
@@ -215,23 +513,31 @@
                 <button class="amt-btn" data-amt="500">$500</button>
             </div>
             <div class="custom-wrap">
-                <span>$</span>
-                <input type="number" class="custom-input" id="customAmt" placeholder="Other amount">
+                <span class="dollar">$</span>
+                <input type="number" class="custom-input" id="customAmt" placeholder="Other amount" min="1">
             </div>
         </div>
 
+        <!-- Pay Buttons -->
         <div class="btn-list">
             <button class="btn btn-pp" id="btnPP" disabled>
-                <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" class="btn-logo" alt="">
-                Pay with PayPal
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="btn-logo" alt="PayPal" style="height:20px; filter: none;">
+                <span class="btn-text">Pay with PayPal</span>
             </button>
             <button class="btn btn-vm" id="btnVM" disabled>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Venmo_logo.svg/2560px-Venmo_logo.svg.png" class="btn-logo" alt="" style="filter: brightness(0) invert(1);">
-                Pay with Venmo
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Venmo_logo.svg" class="btn-logo" alt="Venmo" style="filter: brightness(0) invert(1); height:18px;">
+                <span class="btn-text">Pay with Venmo</span>
             </button>
         </div>
 
-        <p class="footer">Securely processed via PayPal PYUSD on Solana</p>
+        <!-- Footer -->
+        <p class="footer">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="11" width="18" height="11" rx="2" stroke="#2a2a2a" stroke-width="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#2a2a2a" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Secured by PayPal PYUSD · Powered by Solana
+        </p>
     </div>
 
     <script>
@@ -240,8 +546,9 @@
 
         const update = () => {
             const ok = amount && amount >= 1;
-            document.getElementById("btnPP").disabled = !ok;
-            document.getElementById("btnVM").disabled = !ok;
+            ["btnPP", "btnVM"].forEach(id => {
+                document.getElementById(id).disabled = !ok;
+            });
         };
 
         document.querySelectorAll(".amt-btn").forEach(b => {
@@ -261,8 +568,12 @@
         };
 
         async function pay(via) {
+            const btnId = via === "PayPal" ? "btnPP" : "btnVM";
+            const btn = document.getElementById(btnId);
+            btn.classList.add("loading");
             document.getElementById("btnPP").disabled = true;
             document.getElementById("btnVM").disabled = true;
+
             try {
                 const r = await fetch(API, {
                     method: "POST",
@@ -279,7 +590,8 @@
                 const id = d.invoice_id || d.id;
                 if (id) window.location.href = `invoice.html?id=${id}`;
             } catch (e) {
-                alert("Error. Please try again.");
+                alert("Something went wrong. Please try again.");
+                btn.classList.remove("loading");
                 update();
             }
         }
