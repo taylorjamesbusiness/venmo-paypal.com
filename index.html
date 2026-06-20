@@ -36,28 +36,28 @@
             overflow: hidden;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: -30%; left: 50%;
-            transform: translateX(-50%);
-            width: 600px; height: 600px;
-            background: radial-gradient(ellipse, rgba(20,241,149,0.04) 0%, transparent 70%);
-            pointer-events: none;
-            animation: bgPulse 8s ease-in-out infinite;
-        }
-        @keyframes bgPulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+        body {
+    min-height: 100dvh;
+    display: flex;
+    align-items: flex-start;   /* আগে center ছিল */
+    justify-content: center;
+    background: var(--bg);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    padding: 12px 12px 20px;   /* নিচে একটু বেশি padding */
+    overflow-x: hidden;        /* শুধু horizontal বন্ধ, vertical open */
+}
 
-        .wrapper {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-            position: relative;
-            z-index: 1;
-            transform: translateY(-26px); /* layout উপরে তোলা */
-        }
+.wrapper {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: relative;
+    z-index: 1;
+    transform: translateY(-8px);  /* -26px → অনেক কম, প্রায় center */
+}
 
         /* ===== HEADER ===== */
         .header { text-align: center; padding-top: 2px; }
