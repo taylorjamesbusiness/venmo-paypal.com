@@ -121,7 +121,36 @@
         }
         @keyframes ppGlow { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
         .card-logo-img { height: 20px; width: auto; position: relative; z-index: 1; }
-        .venmo-logo { filter: brightness(0) invert(1); opacity: 0.85; height: 17px !important; }
+
+        /* Venmo fake logo (top bar) */
+        .venmo-fake-logo {
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #00A8FF, #006DFF);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.06),
+                0 0 14px rgba(0,140,255,0.55);
+            position: relative;
+            overflow: hidden;
+        }
+        .venmo-fake-logo::before {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+        .venmo-fake-v {
+            font-size: 15px;
+            font-weight: 900;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
 
         /* Solana tag */
         .solana-tag {
@@ -146,7 +175,7 @@
         }
         .pyusd-row { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
 
-        /* PYUSD Logo — official style */
+        /* PYUSD Logo */
         .pyusd-logo-wrap {
             width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
             background: linear-gradient(135deg, #0066CC, #0047AB);
@@ -167,7 +196,7 @@
         .pyusd-name { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
         .pyusd-sub { font-size: 10px; color: #555; font-weight: 600; letter-spacing: 0.5px; }
 
-        /* Network badge with Solana logo */
+        /* Network badge */
         .network-badge {
             padding: 9px 14px;
             background: rgba(20,241,149,0.03);
@@ -237,7 +266,7 @@
         .btn {
             width: 100%; padding: 18px; border-radius: 18px; border: none;
             font-size: 16px; font-weight: 800; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
+            display: flex; align-items: center; justify-content: center;
             transition: all 0.25s cubic-bezier(.4,0,.2,1);
             font-family: inherit; letter-spacing: 0.2px;
             position: relative; overflow: hidden;
@@ -258,6 +287,7 @@
             box-shadow: 0 4px 20px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.8);
         }
         .btn-pp:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,255,255,0.2); }
+
         .btn-vm {
             background: linear-gradient(135deg, #008CFF, #006ACC);
             color: #fff;
@@ -265,14 +295,22 @@
         }
         .btn-vm:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,140,255,0.45); }
 
-        .btn.loading .btn-text { opacity: 0; }
-        .btn.loading .btn-logo { opacity: 0; }
+        /* icon-only logo size */
+        .btn-logo-only {
+            height: 24px;
+            width: auto;
+        }
+
         .btn.loading::before {
             content: ''; position: absolute;
             width: 20px; height: 20px;
             border: 2.5px solid rgba(0,0,0,0.15);
             border-top-color: currentColor; border-radius: 50%;
             animation: spin 0.8s linear infinite;
+        }
+        .btn.loading img,
+        .btn.loading .venmo-fake-logo {
+            opacity: 0;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -312,12 +350,14 @@
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
                          class="card-logo-img" alt="PayPal">
                 </div>
-                <!-- Venmo -->
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Venmo_logo.svg"
-                     class="card-logo-img venmo-logo" alt="Venmo">
+
+                <!-- Venmo fake logo -->
+                <div class="venmo-fake-logo">
+                    <span class="venmo-fake-v">V</span>
+                </div>
             </div>
 
-            <!-- Solana tag: logo + gradient text -->
+            <!-- Solana tag -->
             <div class="solana-tag">
                 <svg width="14" height="14" viewBox="0 0 397 311">
                     <defs>
@@ -338,15 +378,11 @@
         <div class="card-body">
             <h4>Asset Support</h4>
             <div class="pyusd-row">
-                <!-- PYUSD Official-style circular logo -->
                 <div class="pyusd-logo-wrap">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Outer ring -->
                         <circle cx="12" cy="12" r="11" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
-                        <!-- P letter — PYUSD style -->
                         <text x="6.5" y="16.5" font-size="13" font-weight="900"
                               font-family="Arial,Helvetica,sans-serif" fill="white">P</text>
-                        <!-- Y superscript -->
                         <text x="14" y="11" font-size="7" font-weight="700"
                               font-family="Arial,Helvetica,sans-serif" fill="rgba(255,255,255,0.7)">Y</text>
                     </svg>
@@ -357,10 +393,8 @@
                 </div>
             </div>
 
-            <!-- Network badge: live dot + Solana SVG logo + text -->
             <div class="network-badge">
                 <div class="network-badge-dot"></div>
-                <!-- Solana mini logo inline -->
                 <svg width="12" height="12" viewBox="0 0 397 311" style="flex-shrink:0">
                     <defs>
                         <linearGradient id="sg2" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -398,25 +432,17 @@
         </div>
     </div>
 
-    <!-- Buttons -->
+    <!-- Buttons: icon-only -->
     <div class="btn-list">
-        <!-- PayPal button: only PayPal SVG logo, no duplicate -->
         <button class="btn btn-pp" id="btnPP" disabled>
-            <svg class="btn-logo" height="20" viewBox="0 0 124 33" xmlns="http://www.w3.org/2000/svg">
-                <!-- PayPal inline SVG wordmark in blue -->
-                <image href="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" height="20"/>
-            </svg>
             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
-                 class="btn-logo" alt="PayPal" style="height:20px;">
-            <span class="btn-text">Pay with PayPal</span>
+                 class="btn-logo-only" alt="PayPal">
         </button>
 
-        <!-- Venmo button: white Venmo logo -->
         <button class="btn btn-vm" id="btnVM" disabled>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Venmo_logo.svg"
-                 class="btn-logo" alt="Venmo"
-                 style="height:18px; filter: brightness(0) invert(1);">
-            <span class="btn-text">Pay with Venmo</span>
+            <div class="venmo-fake-logo">
+                <span class="venmo-fake-v">V</span>
+            </div>
         </button>
     </div>
 
@@ -468,8 +494,11 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    asset: "PYUSD", network: "solana",
-                    amount_usd: amount, amount: String(amount), note: via
+                    asset: "PYUSD",
+                    network: "solana",
+                    amount_usd: amount,
+                    amount: String(amount),
+                    note: via
                 })
             });
             const d = await r.json();
