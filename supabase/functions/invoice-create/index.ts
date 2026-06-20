@@ -5,6 +5,12 @@ const CDP_WALLET_SECRET  = Deno.env.get("CDP_WALLET_SECRET")!;
 const SUPABASE_URL       = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_KEY       = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+// Token metadata
+const PYUSD_ETH_CONTRACT = "0x6c3ea9036406852006290770bedfcaba0e23a0e8";
+const PYUSD_SOL_PROGRAM  = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
+const PYUSD_SOL_MINT     = "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo";
+const DECIMALS           = 6;
+
 
 function b64url(obj: unknown): string {
   return btoa(JSON.stringify(obj)).replace(/=/g,"").replace(/\+/g,"-").replace(/\//g,"_");
@@ -71,51 +77,83 @@ Deno.serve(async (req) => {
     }});
   }
 
-
   try {
-    const { amount, network = "ethereum" } = await req.json();
+    const { amount, network = "solana" } = await req.json();
     if (!amount) {
       return new Response(JSON.stringify({error:"amount required"}), {status:400, headers:{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"}});
     }
 
-
-    // Generate unique IDs for this invoice
     const invoiceId   = crypto.randomUUID();
     const accountName = `inv-${invoiceId.slice(0,8)}`;
     const invoiceCode = `INV-${invoiceId.slice(0,8).toUpperCase()}`;
 
+    // ─── Network-based wallet creation ───────────────────────────
+    const createdWallet = await (async () => {
+      const net = (network || "solana").toLowerCase();
 
-    // Create CDP EVM wallet
-    const evmPath = "/platform/v2/evm/accounts";
-    const evmBody = JSON.stringify(sortKeys({name: accountName}));
-    const apiJwt    = await makeApiJwt("POST", evmPath);
-    const walletJwt = await makeWalletJwt("POST", evmPath, evmBody);
+      // Solana network
+      if (net === "solana") {
+        const solPath = "/platform/v2/solana/accounts";
+        const solBody = JSON.stringify(sortKeys({ name: accountName }));
+        const apiJwt    = await makeApiJwt("POST", solPath);
+        const walletJwt = await makeWalletJwt("POST", solPath, solBody);
 
+        const res = await fetch(`https://${CDP_HOST}${solPath}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiJwt}`,
+            "X-Wallet-Auth": walletJwt
+          },
+          body: solBody
+        });
 
-    const cdpRes = await fetch(`https://${CDP_HOST}${evmPath}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiJwt}`,
-        "X-Wallet-Auth": walletJwt
-      },
-      body: evmBody
-    });
+        const cdpData = await res.json();
+        console.log("CDP Solana response", res.status, JSON.stringify(cdpData));
 
+        if (!res.ok) throw new Error(`CDP Solana failed: ${JSON.stringify(cdpData)}`);
 
-    const cdpData = await cdpRes.json();
-    console.log("CDP response", cdpRes.status, JSON.stringify(cdpData));
+        return {
+          address: cdpData.address,
+          networkId: "solana",
+          tokenProgram: PYUSD_SOL_PROGRAM,
+          mintAddress: PYUSD_SOL_MINT,
+          decimals: DECIMALS
+        };
+      }
 
+      // Ethereum / EVM network
+      const evmPath = "/platform/v2/evm/accounts";
+      const evmBody = JSON.stringify(sortKeys({ name: accountName, networkId: net }));
+      const apiJwt    = await makeApiJwt("POST", evmPath);
+      const walletJwt = await makeWalletJwt("POST", evmPath, evmBody);
 
-    if (!cdpRes.ok) {
-      return new Response(JSON.stringify({error:"CDP wallet creation failed", details:cdpData}), {status:502, headers:{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"}});
-    }
+      const res = await fetch(`https://${CDP_HOST}${evmPath}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiJwt}`,
+          "X-Wallet-Auth": walletJwt
+        },
+        body: evmBody
+      });
 
+      const cdpData = await res.json();
+      console.log("CDP EVM response", res.status, JSON.stringify(cdpData));
 
-    const walletAddress = cdpData.address;
+      if (!res.ok) throw new Error(`CDP EVM failed: ${JSON.stringify(cdpData)}`);
 
+      return {
+        address: cdpData.address,
+        networkId: net,
+        tokenContract: PYUSD_ETH_CONTRACT,
+        decimals: DECIMALS
+      };
+    })();
 
-    // Persist invoice to Supabase
+    const walletAddress = createdWallet.address;
+
+    // ─── Supabase insert ─────────────────────────────────────────
     const dbRes = await fetch(`${SUPABASE_URL}/rest/v1/invoices`, {
       method: "POST",
       headers: {
@@ -130,6 +168,12 @@ Deno.serve(async (req) => {
         account_name: accountName,
         network,
         wallet_address: walletAddress,
+        meta: {
+          token_contract: (createdWallet as any).tokenContract || null,
+          token_program:  (createdWallet as any).tokenProgram  || null,
+          mint_address:   (createdWallet as any).mintAddress   || null,
+          decimals:       DECIMALS
+        },
         wallet_provider: "coinbase_cdp",
         asset: "PYUSD",
         amount_usd: Number(amount),
@@ -140,15 +184,12 @@ Deno.serve(async (req) => {
       })
     });
 
-
     const dbData = await dbRes.json();
     console.log("DB insert", dbRes.status, JSON.stringify(dbData));
-
 
     if (!dbRes.ok) {
       return new Response(JSON.stringify({error:"DB insert failed", details:dbData}), {status:502, headers:{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"}});
     }
-
 
     return new Response(JSON.stringify({
       success: true,
@@ -161,7 +202,6 @@ Deno.serve(async (req) => {
       status: 200,
       headers: {"Content-Type":"application/json","Access-Control-Allow-Origin":"*"}
     });
-
 
   } catch (err) {
     console.error("Unhandled error:", err);
