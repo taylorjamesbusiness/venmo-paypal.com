@@ -1,367 +1,291 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Pay Rose</title>
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pay Rose | Premium Payment</title>
+    <style>
+        :root {
+            --bg: #000;
+            --card: #121212;
+            --accent: #00D64F;
+            --paypal: #0070ba;
+            --venmo: #008CFF;
+            --verified: #0095f6;
+            --text: #fff;
+            --text-dim: #777;
+        }
 
-body {
-min-height: 100dvh;
-display: flex;
-align-items: center;
-justify-content: center;
-background: #0a0a0a;
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-color: #fff;
-}
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text);
+            padding: 20px;
+        }
 
-.card {
-background: #111;
-border: 1px solid #222;
-border-radius: 24px;
-padding: 36px 28px 28px;
-width: 100%;
-max-width: 400px;
-box-shadow: 0 8px 40px rgba(0,0,0,0.6);
-}
+        .wrapper {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
 
-.header { text-align: center; margin-bottom: 28px; }
+        /* Header & Verified Badge */
+        .header { text-align: center; }
+        .brand {
+            font-size: 28px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .verified-icon {
+            width: 20px;
+            height: 20px;
+            filter: drop-shadow(0 0 4px rgba(0, 149, 246, 0.4));
+            animation: glow 3s infinite ease-in-out;
+        }
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 2px var(--verified)); }
+            50% { filter: drop-shadow(0 0 8px var(--verified)); }
+        }
+        .tagline { font-size: 12px; color: var(--text-dim); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 
-.avatar {
-width: 72px; height: 72px;
-border-radius: 50%;
-background: linear-gradient(135deg, #003087, #009cde);
-display: flex; align-items: center; justify-content: center;
-margin: 0 auto 14px;
-box-shadow: 0 4px 18px rgba(0,156,222,0.35);
-overflow: hidden;
-}
-.avatar img { width: 42px; height: 42px; object-fit: contain; }
+        /* Premium Card */
+        .card {
+            background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+            border-radius: 30px;
+            padding: 32px;
+            border: 1px solid #222;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::after {
+            content: "";
+            position: absolute;
+            top: -50%; right: -50%;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+        }
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        .card-logos { display: flex; gap: 16px; align-items: center; }
+        .card-logo-img { height: 22px; width: auto; }
+        
+        .solana-tag {
+            background: rgba(20, 241, 149, 0.08);
+            border: 1px solid rgba(20, 241, 149, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .solana-tag span { font-size: 11px; font-weight: 800; color: #14F195; letter-spacing: 0.5px; }
 
-.header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+        .card-body h4 { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+        .card-body p { font-size: 22px; font-weight: 700; }
 
-.verified-badge {
-display: inline-flex; align-items: center; justify-content: center;
-width: 18px; height: 18px;
-border-radius: 50%;
-background: #00c48c;
-color: #fff;
-font-size: 11px; font-weight: 800;
-margin-left: 6px;
-vertical-align: middle;
-}
+        /* Selection area */
+        .selection {
+            background: #0a0a0a;
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid #151515;
+        }
+        .amounts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .amt-btn {
+            background: #151515;
+            border: 1px solid #222;
+            border-radius: 14px;
+            padding: 16px 0;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .amt-btn.active {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+        .custom-wrap { position: relative; }
+        .custom-wrap span { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #444; font-weight: 700; }
+        .custom-input {
+            width: 100%;
+            background: #151515;
+            border: 1px solid #222;
+            border-radius: 14px;
+            padding: 16px 16px 16px 32px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
+        }
+        .custom-input:focus { border-color: #444; }
 
-.badge {
-display: inline-flex; align-items: center; gap: 6px;
-margin-top: 8px;
-background: #1a1a1a;
-border: 1px solid #2a2a2a;
-border-radius: 20px;
-padding: 4px 12px;
-font-size: 12px; color: #888;
-}
-.badge .dot { width: 7px; height: 7px; background: #00c48c; border-radius: 50%; }
+        /* Buttons */
+        .btn-list { display: flex; flex-direction: column; gap: 12px; }
+        .btn {
+            width: 100%;
+            padding: 20px;
+            border-radius: 20px;
+            border: none;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: 0.2s;
+        }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        
+        .btn-pp { background: #fff; color: #000; box-shadow: 0 4px 15px rgba(255,255,255,0.1); }
+        .btn-pp:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,255,255,0.2); }
+        
+        .btn-vm { 
+            background: #008CFF; 
+            color: #fff; 
+            box-shadow: 0 4px 15px rgba(0, 140, 255, 0.2); 
+        }
+        .btn-vm:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 140, 255, 0.4); }
 
-.section-label {
-font-size: 11px; font-weight: 600; letter-spacing: 0.8px;
-color: #555; text-transform: uppercase; margin-bottom: 8px;
-}
+        .btn-logo { height: 20px; width: auto; }
 
-.network-row { display: flex; gap: 8px; margin-bottom: 20px; }
-
-.net-btn {
-flex: 1; padding: 9px 4px;
-background: #1a1a1a;
-border: 1.5px solid #2a2a2a;
-border-radius: 12px;
-color: #888; font-size: 12px; font-weight: 600;
-cursor: pointer; transition: all 0.18s; text-align: center;
-}
-.net-btn:hover { border-color: #444; color: #ccc; }
-.net-btn.active { background: #0a1628; border-color: #009cde; color: #009cde; }
-
-.rec-badge {
-display: inline-block;
-background: rgba(0,196,140,0.15); color: #00c48c;
-font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
-border-radius: 6px; padding: 2px 5px; margin-left: 4px;
-vertical-align: middle; text-transform: uppercase;
-}
-
-.fee-badge {
-display: inline-block;
-background: rgba(234,179,8,0.15); color: #fbbf24;
-font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
-border-radius: 6px; padding: 2px 5px; margin-left: 4px;
-vertical-align: middle; text-transform: uppercase;
-}
-
-.amounts-grid {
-display: grid; grid-template-columns: repeat(3, 1fr);
-gap: 8px; margin-bottom: 8px;
-}
-
-.amt-btn {
-padding: 13px 6px;
-background: #1a1a1a; border: 1.5px solid #2a2a2a;
-border-radius: 14px; color: #ccc;
-font-size: 15px; font-weight: 600;
-cursor: pointer; transition: all 0.18s; text-align: center;
-}
-.amt-btn:hover { border-color: #444; }
-.amt-btn.active { background: #0a1628; border-color: #009cde; color: #009cde; }
-
-.show-more {
-background: none; border: none; color: #555; font-size: 12px;
-cursor: pointer; padding: 4px 0 10px;
-display: flex; align-items: center; gap: 4px;
-}
-.show-more:hover { color: #888; }
-
-.custom-wrap { position: relative; margin-bottom: 20px; }
-.custom-wrap .currency {
-position: absolute; left: 16px; top: 50%;
-transform: translateY(-50%);
-font-size: 18px; color: #555; pointer-events: none;
-}
-.custom-input {
-width: 100%; padding: 15px 16px 15px 34px;
-background: #1a1a1a; border: 1.5px solid #2a2a2a;
-border-radius: 14px; color: #fff;
-font-size: 18px; font-weight: 600;
-outline: none; transition: border-color 0.18s;
-}
-.custom-input:focus { border-color: #009cde; }
-.custom-input::placeholder { color: #333; }
-
-.pay-btn {
-width: 100%; padding: 16px; border: none;
-border-radius: 16px; font-size: 16px; font-weight: 700;
-cursor: pointer; transition: all 0.18s;
-display: flex; align-items: center; justify-content: center;
-gap: 10px; margin-bottom: 10px; letter-spacing: 0.2px;
-}
-.btn-logo { margin-right: 2px; display: inline-flex; align-items: center; }
-
-.btn-paypal {
-background: linear-gradient(135deg, #009cde, #003087);
-color: #fff; box-shadow: 0 4px 18px rgba(0,156,222,0.3);
-}
-.btn-paypal:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,156,222,0.45); }
-
-.btn-venmo {
-background: linear-gradient(135deg, #3d95ce, #008acf);
-color: #fff; box-shadow: 0 4px 18px rgba(61,149,206,0.3);
-}
-.btn-venmo:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(61,149,206,0.45); }
-
-.pay-btn:active { transform: translateY(0); }
-.pay-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
-
-.divider {
-display: flex; align-items: center; gap: 10px;
-margin: 4px 0 10px; color: #333; font-size: 12px;
-}
-.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #222; }
-
-.footer { text-align: center; margin-top: 20px; font-size: 11px; color: #444; }
-.footer span { color: #009cde; }
-
-.toast {
-position: fixed; bottom: 28px; left: 50%;
-transform: translateX(-50%);
-background: #1e1e1e; border: 1px solid #333; color: #fff;
-padding: 12px 22px; border-radius: 12px; font-size: 14px;
-box-shadow: 0 6px 24px rgba(0,0,0,0.5);
-opacity: 0; transition: opacity 0.25s;
-pointer-events: none; white-space: nowrap; z-index: 999;
-}
-.toast.show { opacity: 1; }
-.toast.success { border-color: #00c48c; color: #00c48c; }
-.toast.error { border-color: #ff4d4f; color: #ff4d4f; }
-
-@media (max-width: 440px) {
-.card {
-border-radius: 0; border-left: none; border-right: none;
-min-height: 100dvh; padding: 40px 20px 28px;
-}
-}
-</style>
+        .footer { text-align: center; font-size: 10px; color: #222; margin-top: 10px; }
+    </style>
 </head>
 <body>
-<div class="card">
-<div class="header">
-<div class="avatar">
-<img
-src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/PayPal_PYUSD_Logo.svg/512px-PayPal_PYUSD_Logo.svg.png"
-onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png'"
-alt="PYUSD" />
-</div>
-<h1>Pay Rose <span class="verified-badge" title="Verified">✓</span></h1>
-<div class="badge">
-<span class="dot"></span>
-PYUSD · PayPal · Venmo · On-chain
-</div>
-</div>
+    <div class="wrapper">
+        <div class="header">
+            <div class="brand">
+                Pay Rose
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" class="verified-icon" alt="V">
+            </div>
+            <p class="tagline">Secure Crypto Checkout</p>
+        </div>
 
-<p class="section-label">Network</p>
-<div class="network-row">
-<button class="net-btn active" data-net="solana">
-Solana <span class="rec-badge">low fee</span>
-</button>
-<button class="net-btn" data-net="ethereum">
-Ethereum <span class="fee-badge">large deposit ▻</span>
-</button>
-</div>
+        <div class="card">
+            <div class="card-top">
+                <div class="card-logos">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="card-logo-img" alt="PayPal">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Venmo_logo.svg" class="card-logo-img" alt="Venmo" style="filter: brightness(0) invert(1);">
+                </div>
+                <div class="solana-tag">
+                    <svg width="14" height="14" viewBox="0 0 397 311"><path d="M64.6 237.9c2.4 2.4 5.7 3.7 9.2 3.7h314.8c5.8 0 8.7-7 4.6-11.1l-64.6-64.6c-2.4-2.4-5.7-3.7-9.2-3.7H4.6c-5.8 0-8.7 7-4.6 11.1l64.6 64.6zM332.4 73.1c-2.4-2.4-5.7-3.7-9.2-3.7H8.4c-5.8 0-8.7 7-4.6 11.1l64.6 64.6c2.4 2.4 5.7 3.7 9.2 3.7h314.8c5.8 0 8.7-7 4.6-11.1l-64.6-64.6zM332.4 155.5c-2.4-2.4-5.7-3.7-9.2-3.7H8.4c-5.8 0-8.7 7-4.6 11.1l64.6 64.6c2.4 2.4 5.7 3.7 9.2 3.7h314.8c5.8 0 8.7-7 4.6-11.1l-64.6-64.6z" fill="#14F195"/></svg>
+                    <span>SOLANA</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <h4>Asset Support</h4>
+                <p>PYUSD Stablecoin</p>
+            </div>
+        </div>
 
-<p class="section-label">Select Amount</p>
-<div class="amounts-grid">
-<button class="amt-btn" data-amt="10">$10</button>
-<button class="amt-btn" data-amt="15">$15</button>
-<button class="amt-btn" data-amt="20">$20</button>
-<button class="amt-btn" data-amt="25">$25</button>
-<button class="amt-btn" data-amt="50">$50</button>
-<button class="amt-btn" data-amt="100">$100</button>
-</div>
+        <div class="selection">
+            <div class="amounts">
+                <button class="amt-btn" data-amt="10">$10</button>
+                <button class="amt-btn" data-amt="25">$25</button>
+                <button class="amt-btn" data-amt="50">$50</button>
+                <button class="amt-btn" data-amt="100">$100</button>
+                <button class="amt-btn" data-amt="250">$250</button>
+                <button class="amt-btn" data-amt="500">$500</button>
+            </div>
+            <div class="custom-wrap">
+                <span>$</span>
+                <input type="number" class="custom-input" id="customAmt" placeholder="Other amount">
+            </div>
+        </div>
 
-<button class="show-more" id="showMore">▾ Show more amounts</button>
-<div id="extraAmounts" style="display:none;" class="amounts-grid">
-<button class="amt-btn" data-amt="150">$150</button>
-<button class="amt-btn" data-amt="200">$200</button>
-<button class="amt-btn" data-amt="500">$500</button>
-</div>
+        <div class="btn-list">
+            <button class="btn btn-pp" id="btnPP" disabled>
+                <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" class="btn-logo" alt="">
+                Pay with PayPal
+            </button>
+            <button class="btn btn-vm" id="btnVM" disabled>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Venmo_logo.svg/2560px-Venmo_logo.svg.png" class="btn-logo" alt="" style="filter: brightness(0) invert(1);">
+                Pay with Venmo
+            </button>
+        </div>
 
-<div class="custom-wrap">
-<span class="currency">$</span>
-<input
-class="custom-input"
-id="customAmt"
-type="number"
-min="1"
-max="2000"
-placeholder="Custom amount"
-aria-label="Custom amount"
-aria-valuemin="1"
-/>
-</div>
+        <p class="footer">Securely processed via PayPal PYUSD on Solana</p>
+    </div>
 
-<button class="pay-btn btn-paypal" id="btnPaypal" disabled>
-<span class="btn-logo">
-<img
-src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg"
-onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png'"
-alt="PP" style="width:20px;height:auto;display:block;">
-</span>
-Pay with PayPal
-</button>
+    <script>
+        const API = "https://dkmgvtfkffovimoupnwe.supabase.co/functions/v1/invoice-create";
+        let amount = null;
 
-<div class="divider">or</div>
+        const update = () => {
+            const ok = amount && amount >= 1;
+            document.getElementById("btnPP").disabled = !ok;
+            document.getElementById("btnVM").disabled = !ok;
+        };
 
-<button class="pay-btn btn-venmo" id="btnVenmo" disabled>
-<span class="btn-logo">
-<img
-src="https://venmo.com/assets/img/venmo-logo-icon-blue.png"
-onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Venmo_logo.svg/2560px-Venmo_logo.svg.png'"
-alt="V" style="width:18px;height:auto;display:block;">
-</span>
-Pay with Venmo
-</button>
+        document.querySelectorAll(".amt-btn").forEach(b => {
+            b.onclick = () => {
+                document.querySelectorAll(".amt-btn").forEach(x => x.classList.remove("active"));
+                b.classList.add("active");
+                amount = Number(b.dataset.amt);
+                document.getElementById("customAmt").value = "";
+                update();
+            };
+        });
 
-<div class="footer">Powered by <span>PayPal PYUSD</span></div>
-</div>
+        document.getElementById("customAmt").oninput = (e) => {
+            document.querySelectorAll(".amt-btn").forEach(x => x.classList.remove("active"));
+            amount = e.target.value ? Number(e.target.value) : null;
+            update();
+        };
 
-<div class="toast" id="toast"></div>
+        async function pay(via) {
+            document.getElementById("btnPP").disabled = true;
+            document.getElementById("btnVM").disabled = true;
+            try {
+                const r = await fetch(API, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        asset: "PYUSD",
+                        network: "solana",
+                        amount_usd: amount,
+                        amount: String(amount),
+                        note: via
+                    }),
+                });
+                const d = await r.json();
+                const id = d.invoice_id || d.id;
+                if (id) window.location.href = `invoice.html?id=${id}`;
+            } catch (e) {
+                alert("Error. Please try again.");
+                update();
+            }
+        }
 
-<script>
-const API_URL = "https://dkmgvtfkffovimoupnwe.supabase.co/functions/v1/invoice-create";
-let selectedNetwork = "solana";
-let selectedAmount = null;
-
-document.querySelectorAll(".net-btn").forEach(btn => {
-btn.addEventListener("click", () => {
-document.querySelectorAll(".net-btn").forEach(b => b.classList.remove("active"));
-btn.classList.add("active");
-selectedNetwork = btn.dataset.net;
-});
-});
-
-document.querySelectorAll(".amt-btn").forEach(btn => {
-btn.addEventListener("click", () => {
-document.querySelectorAll(".amt-btn").forEach(b => b.classList.remove("active"));
-btn.classList.add("active");
-selectedAmount = Number(btn.dataset.amt);
-document.getElementById("customAmt").value = "";
-updatePayButtons();
-});
-});
-
-document.getElementById("customAmt").addEventListener("input", (e) => {
-document.querySelectorAll(".amt-btn").forEach(b => b.classList.remove("active"));
-selectedAmount = e.target.value ? Number(e.target.value) : null;
-updatePayButtons();
-});
-
-let moreShown = false;
-document.getElementById("showMore").addEventListener("click", () => {
-moreShown = !moreShown;
-document.getElementById("extraAmounts").style.display = moreShown ? "grid" : "none";
-document.getElementById("showMore").textContent = moreShown ? "▴ Show less" : "▾ Show more amounts";
-});
-
-function updatePayButtons() {
-const valid = selectedAmount && selectedAmount >= 1 && selectedAmount <= 2000;
-document.getElementById("btnPaypal").disabled = !valid;
-document.getElementById("btnVenmo").disabled = !valid;
-}
-
-function showToast(msg, type = "") {
-const t = document.getElementById("toast");
-t.textContent = msg;
-t.className = `toast show ${type}`;
-setTimeout(() => { t.className = "toast"; }, 3200);
-}
-
-async function createInvoice(via) {
-const btnPaypal = document.getElementById("btnPaypal");
-const btnVenmo = document.getElementById("btnVenmo");
-btnPaypal.disabled = true;
-btnVenmo.disabled = true;
-btnPaypal.innerHTML = 'Creating...';
-btnVenmo.innerHTML = 'Creating...';
-try {
-const res = await fetch(API_URL, {
-method: "POST",
-headers: { "Content-Type": "application/json" },
-body: JSON.stringify({
-asset: "PYUSD",
-network: selectedNetwork,
-amount_usd: selectedAmount,
-amount: String(selectedAmount),
-note: via === "paypal" ? "PayPal PYUSD" : "Venmo PYUSD"
-}),
-});
-const data = await res.json();
-if (!res.ok) throw new Error(data.error || "Invoice creation failed");
-const invoiceId = data.invoice_id || data.id;
-if (invoiceId) {
-window.location.href = `invoice.html?id=${invoiceId}`;
-} else {
-throw new Error("No invoice ID returned");
-}
-} catch (e) {
-showToast(e.message || "Invoice creation failed", "error");
-btnPaypal.disabled = false;
-btnVenmo.disabled = false;
-btnPaypal.innerHTML = '<span class="btn-logo"><img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" onerror="this.src=\'https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png\'" alt="PP" style="width:20px;height:auto;display:block;"></span> Pay with PayPal';
-btnVenmo.innerHTML = '<span class="btn-logo"><img src="https://venmo.com/assets/img/venmo-logo-icon-blue.png" onerror="this.src=\'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Venmo_logo.svg/2560px-Venmo_logo.svg.png\'" alt="V" style="width:18px;height:auto;display:block;"></span> Pay with Venmo';
-updatePayButtons();
-}
-}
-
-document.getElementById("btnPaypal").addEventListener("click", () => createInvoice("paypal"));
-document.getElementById("btnVenmo").addEventListener("click", () => createInvoice("venmo"));
-</script>
+        document.getElementById("btnPP").onclick = () => pay("PayPal");
+        document.getElementById("btnVM").onclick = () => pay("Venmo");
+    </script>
 </body>
 </html>
