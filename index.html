@@ -19,6 +19,7 @@
             --text: #fff;
             --text-dim: #555;
             --border: rgba(255,255,255,0.07);
+            --accent-pill: linear-gradient(135deg, #1BFF9E, #00D1FF);
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,8 +32,8 @@
             background: var(--bg);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--text);
-            padding: 20px;
-            overflow: hidden;       /* page fixed, scroll/লাফ কম */
+            padding: 8px 12px 12px;
+            overflow: hidden;
         }
 
         body::before {
@@ -52,17 +53,18 @@
             max-width: 400px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 18px;
             position: relative;
             z-index: 1;
+            transform: translateY(-26px); /* layout উপরে তোলা */
         }
 
         /* ===== HEADER ===== */
-        .header { text-align: center; padding: 8px 0; }
+        .header { text-align: center; padding-top: 2px; }
         .brand {
             font-size: 30px; font-weight: 900;
             display: flex; align-items: center; justify-content: center;
-            gap: 10px; margin-bottom: 6px; letter-spacing: -0.5px;
+            gap: 10px; margin-bottom: 4px; letter-spacing: -0.5px;
         }
         .verified-icon { width: 22px; height: 22px; animation: verifiedPop 3s ease-in-out infinite; }
         @keyframes verifiedPop {
@@ -86,7 +88,7 @@
         .card {
             background: linear-gradient(160deg, #141420 0%, #0a0a12 60%, #0d1020 100%);
             border-radius: 28px;
-            padding: 28px;
+            padding: 26px;
             border: 1px solid rgba(255,255,255,0.08);
             box-shadow: 0 0 0 1px rgba(20,241,149,0.04), 0 20px 60px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06);
             position: relative; overflow: hidden;
@@ -108,7 +110,7 @@
 
         .card-top {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 28px; position: relative; z-index: 1;
+            margin-bottom: 24px; position: relative; z-index: 1;
         }
         .card-logos { display: flex; gap: 12px; align-items: center; }
 
@@ -121,7 +123,6 @@
         @keyframes ppGlow { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
         .card-logo-img { height: 20px; width: auto; position: relative; z-index: 1; }
 
-        /* Venmo fake brand (top bar) */
         .venmo-brand {
             display: inline-flex;
             align-items: center;
@@ -179,7 +180,6 @@
             100% { transform: scaleX(0); }
         }
 
-        /* Solana tag */
         .solana-tag {
             background: linear-gradient(135deg, rgba(20,241,149,0.1) 0%, rgba(153,69,255,0.08) 100%);
             border: 1px solid rgba(20,241,149,0.25);
@@ -194,7 +194,6 @@
         }
         .solana-tag span { font-size: 10px; font-weight: 800; color: #14F195; letter-spacing: 1px; }
 
-        /* Card body */
         .card-body { position: relative; z-index: 1; }
         .card-body h4 {
             font-size: 10px; color: #444; text-transform: uppercase;
@@ -241,33 +240,35 @@
         /* ===== SELECTION ===== */
         .selection {
             background: linear-gradient(160deg, #101018, #0c0c14);
-            border-radius: 24px; padding: 22px;
+            border-radius: 24px; padding: 20px;
             border: 1px solid var(--border);
             box-shadow: 0 8px 30px rgba(0,0,0,0.4);
         }
         .sel-label {
             font-size: 10px; color: #444; letter-spacing: 2px;
-            text-transform: uppercase; font-weight: 700; margin-bottom: 14px;
+            text-transform: uppercase; font-weight: 700; margin-bottom: 12px;
         }
         .amounts {
             display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 10px; margin-bottom: 14px;
+            gap: 10px; margin-bottom: 12px;
         }
         .amt-btn {
             background: rgba(255,255,255,0.04);
             border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 14px; padding: 15px 0;
+            border-radius: 14px; padding: 14px 0;
             color: #aaa; font-size: 17px; font-weight: 700;
             cursor: pointer; transition: all 0.2s cubic-bezier(.4,0,.2,1);
             font-family: inherit; position: relative; overflow: hidden;
         }
         .amt-btn:hover { color: #fff; border-color: rgba(255,255,255,0.15); transform: translateY(-1px); }
         .amt-btn.active {
-            background: linear-gradient(135deg, #14F195, #0BC97A);
-            color: #000; border-color: transparent;
-            box-shadow: 0 4px 20px rgba(20,241,149,0.3);
+            background: var(--accent-pill);
+            color: #02140d;
+            border-color: transparent;
+            box-shadow: 0 4px 20px rgba(0, 240, 180, 0.35);
             transform: translateY(-2px);
         }
+
         .custom-wrap { position: relative; }
         .custom-wrap .dollar {
             position: absolute; left: 16px; top: 50%;
@@ -287,14 +288,13 @@
         }
 
         /* ===== BUTTONS ===== */
-        .btn-list { display: flex; flex-direction: column; gap: 12px; }
+        .btn-list { display: flex; flex-direction: column; gap: 10px; }
         .btn {
-            width: 100%; padding: 18px; border-radius: 18px; border: none;
+            width: 100%; padding: 16px; border-radius: 18px; border: none;
             font-size: 16px; font-weight: 800; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             transition: all 0.25s cubic-bezier(.4,0,.2,1);
-            font-family: inherit; letter-spacing: 0.2px;
-            position: relative; overflow: hidden;
+            font-family: inherit; position: relative; overflow: hidden;
         }
         .btn::after {
             content: ''; position: absolute;
@@ -325,7 +325,6 @@
             width: auto;
         }
 
-        /* Venmo label on button */
         .venmo-btn-content {
             display: inline-flex;
             align-items: center;
@@ -354,7 +353,7 @@
         .footer {
             text-align: center; font-size: 10px; color: #2a2a2a;
             display: flex; align-items: center; justify-content: center;
-            gap: 6px; padding-bottom: 4px;
+            gap: 6px; padding-bottom: 2px;
         }
     </style>
 </head>
@@ -381,13 +380,10 @@
     <div class="card">
         <div class="card-top">
             <div class="card-logos">
-                <!-- PayPal -->
                 <div class="paypal-wrap">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
                          class="card-logo-img" alt="PayPal">
                 </div>
-
-                <!-- Venmo fake brand (logo + text) -->
                 <div class="venmo-brand">
                     <div class="venmo-fake-logo">
                         <span class="venmo-fake-v">V</span>
@@ -396,7 +392,6 @@
                 </div>
             </div>
 
-            <!-- Solana tag -->
             <div class="solana-tag">
                 <svg width="14" height="14" viewBox="0 0 397 311">
                     <defs>
@@ -413,7 +408,6 @@
             </div>
         </div>
 
-        <!-- PYUSD body -->
         <div class="card-body">
             <h4>Asset Support</h4>
             <div class="pyusd-row">
