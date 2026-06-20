@@ -19,7 +19,6 @@
             --text-dim: #555;
             --border: rgba(255,255,255,0.07);
             --accent-pill: linear-gradient(135deg, #1BFF9E, #00D1FF);
-            --secure-green: #14F195;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -71,18 +70,18 @@
             50% { filter: drop-shadow(0 0 8px var(--verified)) brightness(1.2); transform: scale(1.05); }
         }
 
-        /* Premium Secure Payment pill */
+        /* ===== PAYPAL PREMIUM BLUE PILL ===== */
         .secure-pill {
             display: inline-flex;
             align-items: center;
             gap: 7px;
             padding: 7px 18px;
             border-radius: 999px;
-            border: 1.5px solid rgba(20,241,149,0.35);
-            background: rgba(20,241,149,0.05);
+            border: 1.5px solid rgba(0, 112, 186, 0.55);
+            background: rgba(0, 82, 165, 0.12);
             font-size: 11px;
             font-weight: 800;
-            color: var(--secure-green);
+            color: #5BA4F5;
             letter-spacing: 0.8px;
             text-transform: uppercase;
             position: relative;
@@ -94,7 +93,7 @@
             position: absolute;
             inset: 0;
             border-radius: 999px;
-            background: linear-gradient(90deg, transparent, rgba(20,241,149,0.08), transparent);
+            background: linear-gradient(90deg, transparent, rgba(0, 140, 255, 0.12), transparent);
             transform: translateX(-100%);
             animation: pillShimmer 3s ease-in-out infinite 0.5s;
         }
@@ -103,13 +102,13 @@
             50%,100% { transform: translateX(100%); }
         }
         @keyframes pillPulse {
-            0%,100% { box-shadow: 0 0 0 0 rgba(20,241,149,0.0), inset 0 0 0 0 rgba(20,241,149,0); border-color: rgba(20,241,149,0.3); }
-            50% { box-shadow: 0 0 18px rgba(20,241,149,0.18); border-color: rgba(20,241,149,0.6); }
+            0%,100% { box-shadow: 0 0 0 0 rgba(0,112,186,0.0); border-color: rgba(0,112,186,0.45); }
+            50% { box-shadow: 0 0 18px rgba(0,112,186,0.35); border-color: rgba(0,140,255,0.75); }
         }
         .secure-pill svg { flex-shrink: 0; animation: shieldBeat 3s ease-in-out infinite; }
         @keyframes shieldBeat {
-            0%,100% { filter: drop-shadow(0 0 2px rgba(20,241,149,0.5)); }
-            50% { filter: drop-shadow(0 0 7px rgba(20,241,149,0.9)); }
+            0%,100% { filter: drop-shadow(0 0 2px rgba(0,140,255,0.5)); }
+            50% { filter: drop-shadow(0 0 7px rgba(0,140,255,0.9)); }
         }
 
         @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
@@ -360,15 +359,14 @@
             </svg>
         </div>
 
-        <!-- Premium Secure Payment pill badge -->
+        <!-- PayPal Premium Blue pill — "Verified Crypto Checkout" -->
         <div class="secure-pill">
-            <!-- Shield + checkmark icon -->
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                 <path d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11.35C16.5 22.15 20 17.25 20 12V6l-8-4z"
-                      fill="rgba(20,241,149,0.15)" stroke="#14F195" stroke-width="1.6" stroke-linejoin="round"/>
-                <path d="M9 12l2.5 2.5L15 9" stroke="#14F195" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      fill="rgba(0,112,186,0.18)" stroke="#5BA4F5" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M9 12l2.5 2.5L15 9" stroke="#5BA4F5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Secure Payment
+            Verified Crypto Checkout
         </div>
     </div>
 
@@ -420,7 +418,6 @@
                 </div>
             </div>
 
-            <!-- Network badge: Network · [sol logo] Solana Mainnet · Fast · <$0.01 fee -->
             <div class="network-badge">
                 <div class="network-badge-dot"></div>
                 <span class="net-label">Network</span>
