@@ -32,8 +32,8 @@
             background: var(--bg);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--text);
-            padding: 8px 12px 12px;
-            overflow-x: hidden;     /* vertical free => pull-to-refresh OK */
+            padding: 10px 12px 12px;
+            overflow-x: hidden;   /* pull-to-refresh OK */
         }
 
         body::before {
@@ -50,47 +50,48 @@
 
         .wrapper {
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;         /* সামান্য স্লিম */
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 16px;
             position: relative;
             z-index: 1;
-            transform: translateY(-14px); /* সামান্য উপরে */
+            /* translateY হटा দিলাম – default position */
         }
 
         /* ===== HEADER ===== */
-        .header { text-align: center; padding-top: 2px; }
+        .header { text-align: center; padding-top: 0; }
         .brand {
-            font-size: 30px; font-weight: 900;
+            font-size: 28px;          /* একটু ছোট */
+            font-weight: 900;
             display: flex; align-items: center; justify-content: center;
-            gap: 10px; margin-bottom: 4px; letter-spacing: -0.5px;
+            gap: 8px; margin-bottom: 4px; letter-spacing: -0.4px;
         }
-        .verified-icon { width: 22px; height: 22px; animation: verifiedPop 3s ease-in-out infinite; }
+        .verified-icon { width: 20px; height: 20px; animation: verifiedPop 3s ease-in-out infinite; }
         @keyframes verifiedPop {
             0%,100% { filter: drop-shadow(0 0 3px var(--verified)) brightness(1); transform: scale(1); }
-            50% { filter: drop-shadow(0 0 10px var(--verified)) brightness(1.3); transform: scale(1.1); }
+            50% { filter: drop-shadow(0 0 8px var(--verified)) brightness(1.2); transform: scale(1.05); }
         }
         .tagline {
-            font-size: 10px; color: var(--text-dim); font-weight: 700;
-            letter-spacing: 2.5px; text-transform: uppercase;
-            display: flex; align-items: center; justify-content: center; gap: 7px;
+            font-size: 9px; color: var(--text-dim); font-weight: 700;
+            letter-spacing: 2.3px; text-transform: uppercase;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
         }
         .tagline-dot {
-            width: 5px; height: 5px; border-radius: 50%;
+            width: 4px; height: 4px; border-radius: 50%;
             background: var(--solana); display: inline-block;
             animation: blink 2s ease-in-out infinite;
-            box-shadow: 0 0 6px var(--solana);
+            box-shadow: 0 0 5px var(--solana);
         }
         @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
         /* ===== CARD ===== */
         .card {
             background: linear-gradient(160deg, #141420 0%, #0a0a12 60%, #0d1020 100%);
-            border-radius: 28px;
-            padding: 26px;
+            border-radius: 24px;
+            padding: 22px;
             border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 0 0 1px rgba(20,241,149,0.04), 0 20px 60px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06);
+            box-shadow: 0 0 0 1px rgba(20,241,149,0.04), 0 18px 50px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06);
             position: relative; overflow: hidden;
         }
         .card::before {
@@ -102,35 +103,35 @@
         @keyframes shimmer { 0% { left: -100%; } 40%,100% { left: 150%; } }
         .card::after {
             content: ''; position: absolute;
-            bottom: -60px; right: -60px;
-            width: 180px; height: 180px;
+            bottom: -50px; right: -50px;
+            width: 150px; height: 150px;
             background: radial-gradient(circle, rgba(153,69,255,0.08) 0%, rgba(20,241,149,0.04) 40%, transparent 70%);
             pointer-events: none;
         }
 
         .card-top {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 24px; position: relative; z-index: 1;
+            margin-bottom: 20px; position: relative; z-index: 1;
         }
-        .card-logos { display: flex; gap: 12px; align-items: center; }
+        .card-logos { display: flex; gap: 10px; align-items: center; }
 
         .paypal-wrap { position: relative; display: flex; align-items: center; }
         .paypal-wrap::after {
-            content: ''; position: absolute; inset: -5px; border-radius: 8px;
+            content: ''; position: absolute; inset: -4px; border-radius: 8px;
             background: radial-gradient(circle, rgba(0,112,186,0.25), transparent);
             animation: ppGlow 3s ease-in-out infinite; pointer-events: none;
         }
         @keyframes ppGlow { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
-        .card-logo-img { height: 20px; width: auto; position: relative; z-index: 1; }
+        .card-logo-img { height: 18px; width: auto; position: relative; z-index: 1; }
 
         .venmo-brand {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
         .venmo-fake-logo {
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             border-radius: 999px;
             background: linear-gradient(135deg, #00A8FF, #006DFF);
             display: flex;
@@ -138,7 +139,7 @@
             justify-content: center;
             box-shadow:
                 0 0 0 1px rgba(255,255,255,0.06),
-                0 0 12px rgba(0,140,255,0.55);
+                0 0 10px rgba(0,140,255,0.55);
             position: relative;
             overflow: hidden;
         }
@@ -150,14 +151,14 @@
             border: 1px solid rgba(255,255,255,0.18);
         }
         .venmo-fake-v {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 900;
             font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
             color: #fff;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
         }
         .venmo-text-top {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 800;
             text-transform: lowercase;
             color: #e5f4ff;
@@ -183,55 +184,55 @@
         .solana-tag {
             background: linear-gradient(135deg, rgba(20,241,149,0.1) 0%, rgba(153,69,255,0.08) 100%);
             border: 1px solid rgba(20,241,149,0.25);
-            padding: 7px 12px; border-radius: 20px;
-            display: flex; align-items: center; gap: 6px;
-            box-shadow: 0 0 12px rgba(20,241,149,0.08), inset 0 1px 0 rgba(255,255,255,0.06);
+            padding: 6px 11px; border-radius: 18px;
+            display: flex; align-items: center; gap: 5px;
+            box-shadow: 0 0 10px rgba(20,241,149,0.08), inset 0 1px 0 rgba(255,255,255,0.06);
             animation: solanaPulse 4s ease-in-out infinite;
         }
         @keyframes solanaPulse {
-            0%,100% { box-shadow: 0 0 8px rgba(20,241,149,0.08); border-color: rgba(20,241,149,0.25); }
-            50% { box-shadow: 0 0 18px rgba(20,241,149,0.22); border-color: rgba(20,241,149,0.5); }
+            0%,100% { box-shadow: 0 0 7px rgba(20,241,149,0.08); border-color: rgba(20,241,149,0.25); }
+            50% { box-shadow: 0 0 16px rgba(20,241,149,0.22); border-color: rgba(20,241,149,0.5); }
         }
-        .solana-tag span { font-size: 10px; font-weight: 800; color: #14F195; letter-spacing: 1px; }
+        .solana-tag span { font-size: 9px; font-weight: 800; color: #14F195; letter-spacing: 1px; }
 
         .card-body { position: relative; z-index: 1; }
         .card-body h4 {
-            font-size: 10px; color: #444; text-transform: uppercase;
-            letter-spacing: 2px; margin-bottom: 12px; font-weight: 600;
+            font-size: 9px; color: #444; text-transform: uppercase;
+            letter-spacing: 2px; margin-bottom: 10px; font-weight: 600;
         }
-        .pyusd-row { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+        .pyusd-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
 
         .pyusd-logo-wrap {
-            width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+            width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
             background: linear-gradient(135deg, #0066CC, #0047AB);
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 18px rgba(0,102,204,0.45), inset 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow: 0 0 14px rgba(0,102,204,0.45), inset 0 1px 0 rgba(255,255,255,0.2);
             animation: pyusdGlow 3s ease-in-out infinite;
             position: relative; overflow: hidden;
         }
         .pyusd-logo-wrap::before {
             content: ''; position: absolute; inset: 2px; border-radius: 50%;
-            border: 1.5px solid rgba(255,255,255,0.15);
+            border: 1.3px solid rgba(255,255,255,0.15);
         }
         @keyframes pyusdGlow {
-            0%,100% { box-shadow: 0 0 12px rgba(0,102,204,0.35); }
-            50% { box-shadow: 0 0 24px rgba(0,102,204,0.7); }
+            0%,100% { box-shadow: 0 0 10px rgba(0,102,204,0.35); }
+            50% { box-shadow: 0 0 20px rgba(0,102,204,0.7); }
         }
-        .pyusd-info { display: flex; flex-direction: column; gap: 3px; }
-        .pyusd-name { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
-        .pyusd-sub { font-size: 10px; color: #555; font-weight: 600; letter-spacing: 0.5px; }
+        .pyusd-info { display: flex; flex-direction: column; gap: 2px; }
+        .pyusd-name { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
+        .pyusd-sub { font-size: 9px; color: #555; font-weight: 600; letter-spacing: 0.5px; }
 
         .network-badge {
-            padding: 9px 14px;
+            padding: 7px 12px;
             background: rgba(20,241,149,0.03);
             border: 1px solid rgba(20,241,149,0.1);
-            border-radius: 14px;
-            display: flex; align-items: center; gap: 8px;
-            font-size: 11px; color: #555; font-weight: 600;
+            border-radius: 12px;
+            display: flex; align-items: center; gap: 7px;
+            font-size: 10px; color: #555; font-weight: 600;
         }
         .network-badge-dot {
-            width: 6px; height: 6px; border-radius: 50%;
-            background: var(--solana); box-shadow: 0 0 6px var(--solana);
+            width: 5px; height: 5px; border-radius: 50%;
+            background: var(--solana); box-shadow: 0 0 5px var(--solana);
             animation: blink 2s ease-in-out infinite; flex-shrink: 0;
         }
         .network-badge .sol-label { color: #14F195; font-weight: 700; }
@@ -240,23 +241,23 @@
         /* ===== SELECTION ===== */
         .selection {
             background: linear-gradient(160deg, #101018, #0c0c14);
-            border-radius: 24px; padding: 20px;
+            border-radius: 22px; padding: 18px;
             border: 1px solid var(--border);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 26px rgba(0,0,0,0.4);
         }
         .sel-label {
-            font-size: 10px; color: #444; letter-spacing: 2px;
-            text-transform: uppercase; font-weight: 700; margin-bottom: 12px;
+            font-size: 9px; color: #444; letter-spacing: 2px;
+            text-transform: uppercase; font-weight: 700; margin-bottom: 10px;
         }
         .amounts {
             display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 10px; margin-bottom: 12px;
+            gap: 9px; margin-bottom: 10px;
         }
         .amt-btn {
             background: rgba(255,255,255,0.04);
             border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 14px; padding: 14px 0;
-            color: #aaa; font-size: 17px; font-weight: 700;
+            border-radius: 13px; padding: 12px 0;
+            color: #aaa; font-size: 16px; font-weight: 700;
             cursor: pointer; transition: all 0.2s cubic-bezier(.4,0,.2,1);
             font-family: inherit; position: relative; overflow: hidden;
         }
@@ -265,20 +266,20 @@
             background: var(--accent-pill);
             color: #02140d;
             border-color: transparent;
-            box-shadow: 0 4px 20px rgba(0, 240, 180, 0.35);
+            box-shadow: 0 4px 18px rgba(0, 240, 180, 0.35);
             transform: translateY(-2px);
         }
 
-        .custom-wrap { position: relative; }
+        .custom-wrap { position: relative; margin-top: 2px; }
         .custom-wrap .dollar {
-            position: absolute; left: 16px; top: 50%;
-            transform: translateY(-50%); color: #444; font-weight: 700; font-size: 16px;
+            position: absolute; left: 14px; top: 50%;
+            transform: translateY(-50%); color: #444; font-weight: 700; font-size: 15px;
         }
         .custom-input {
             width: 100%; background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06); border-radius: 14px;
-            padding: 15px 16px 15px 32px; color: #fff;
-            font-size: 15px; font-weight: 600; outline: none; font-family: inherit;
+            border: 1px solid rgba(255,255,255,0.06); border-radius: 13px;
+            padding: 13px 14px 13px 30px; color: #fff;
+            font-size: 14px; font-weight: 600; outline: none; font-family: inherit;
             transition: all 0.2s;
         }
         .custom-input::placeholder { color: #333; }
@@ -288,10 +289,10 @@
         }
 
         /* ===== BUTTONS ===== */
-        .btn-list { display: flex; flex-direction: column; gap: 10px; }
+        .btn-list { display: flex; flex-direction: column; gap: 8px; }
         .btn {
-            width: 100%; padding: 16px; border-radius: 18px; border: none;
-            font-size: 16px; font-weight: 800; cursor: pointer;
+            width: 100%; padding: 14px; border-radius: 16px; border: none;
+            font-size: 15px; font-weight: 800; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             transition: all 0.25s cubic-bezier(.4,0,.2,1);
             font-family: inherit; position: relative; overflow: hidden;
@@ -309,29 +310,29 @@
         .btn-pp {
             background: linear-gradient(135deg, #ffffff, #f0f0f0);
             color: #003087;
-            box-shadow: 0 4px 20px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.8);
+            box-shadow: 0 4px 18px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.8);
         }
-        .btn-pp:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,255,255,0.2); }
+        .btn-pp:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,255,255,0.2); }
 
         .btn-vm {
             background: linear-gradient(135deg, #008CFF, #006ACC);
             color: #fff;
-            box-shadow: 0 4px 20px rgba(0,140,255,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+            box-shadow: 0 4px 18px rgba(0,140,255,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
         }
-        .btn-vm:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,140,255,0.45); }
+        .btn-vm:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,140,255,0.45); }
 
         .btn-logo-only {
-            height: 24px;
+            height: 22px;
             width: auto;
         }
 
         .venmo-btn-content {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 7px;
         }
         .venmo-text-btn {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 800;
             text-transform: lowercase;
             letter-spacing: 0.3px;
@@ -339,7 +340,7 @@
 
         .btn.loading::before {
             content: ''; position: absolute;
-            width: 20px; height: 20px;
+            width: 18px; height: 18px;
             border: 2.5px solid rgba(0,0,0,0.15);
             border-top-color: currentColor; border-radius: 50%;
             animation: spin 0.8s linear infinite;
@@ -351,7 +352,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .footer {
-            text-align: center; font-size: 10px; color: #2a2a2a;
+            text-align: center; font-size: 9px; color: #2a2a2a;
             display: flex; align-items: center; justify-content: center;
             gap: 6px; padding-bottom: 2px;
         }
@@ -393,7 +394,7 @@
             </div>
 
             <div class="solana-tag">
-                <svg width="14" height="14" viewBox="0 0 397 311">
+                <svg width="12" height="12" viewBox="0 0 397 311">
                     <defs>
                         <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" stop-color="#14F195"/>
@@ -412,7 +413,7 @@
             <h4>Asset Support</h4>
             <div class="pyusd-row">
                 <div class="pyusd-logo-wrap">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="12" cy="12" r="11" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
                         <text x="6.5" y="16.5" font-size="13" font-weight="900"
                               font-family="Arial,Helvetica,sans-serif" fill="white">P</text>
@@ -428,7 +429,7 @@
 
             <div class="network-badge">
                 <div class="network-badge-dot"></div>
-                <svg width="12" height="12" viewBox="0 0 397 311" style="flex-shrink:0">
+                <svg width="11" height="11" viewBox="0 0 397 311" style="flex-shrink:0">
                     <defs>
                         <linearGradient id="sg2" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" stop-color="#14F195"/>
@@ -483,7 +484,7 @@
     </div>
 
     <p class="footer">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
             <rect x="3" y="11" width="18" height="11" rx="2" stroke="#2a2a2a" stroke-width="2"/>
             <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#2a2a2a" stroke-width="2" stroke-linecap="round"/>
         </svg>
