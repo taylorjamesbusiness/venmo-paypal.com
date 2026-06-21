@@ -130,6 +130,7 @@
     .pill.paid    { background: rgba(20,241,149,0.1); color: var(--green); border: 1px solid rgba(20,241,149,0.2); }
     .pill.pending { background: rgba(245,158,11,0.1); color: var(--yellow); border: 1px solid rgba(245,158,11,0.2); }
     .pill.expired { background: rgba(239,68,68,0.1);  color: var(--red);   border: 1px solid rgba(239,68,68,0.2); }
+    .pill.withdrawn { background: rgba(59,130,246,0.12); color: var(--blue); border: 1px solid rgba(59,130,246,0.4); }
 
     .withdraw-btn {
       background: rgba(0,82,165,0.15); border: 1px solid rgba(0,112,186,0.35);
@@ -227,7 +228,6 @@
     .toast.error   { border-color: rgba(239,68,68,0.3);  color: var(--red); }
 
     /* ── LOADING / EMPTY ── */
-    .empty { text-align: center; padding: 48px 20px; color: #333; font-size: 14px; }
     .loading-row td { text-align: center; padding: 48px; color: #333; }
 
     /* ── MOBILE ── */
@@ -240,6 +240,43 @@
   </style>
 </head>
 <body>
+
+<!-- Lock screen -->
+<div id="lockscreen" style="
+  position:fixed;inset:0;background:#050508;display:flex;
+  align-items:center;justify-content:center;z-index:9999;
+">
+  <div style="
+    width:100%;max-width:360px;background:#0e0e18;border-radius:20px;
+    border:1px solid rgba(255,255,255,0.08);padding:24px;
+    box-shadow:0 18px 40px rgba(0,0,0,0.7);text-align:center;
+  ">
+    <div style="font-size:20px;font-weight:900;margin-bottom:8px;">
+      Pay <span style="color:#5BA4F5;">Rose</span> Admin
+    </div>
+    <div style="font-size:11px;color:#666;margin-bottom:18px;">
+      Enter your admin passcode to continue
+    </div>
+    <input type="password" id="adminPass"
+      placeholder="Admin passcode"
+      style="
+        width:100%;background:rgba(255,255,255,0.04);
+        border:1px solid rgba(255,255,255,0.08);border-radius:12px;
+        padding:12px 14px;color:#fff;font-size:13px;font-weight:600;
+        outline:none;margin-bottom:10px;
+      "
+    />
+    <div id="lockError" style="font-size:11px;color:#ef4444;min-height:14px;margin-bottom:10px;"></div>
+    <button onclick="unlockAdmin()" style="
+      width:100%;padding:12px;border:none;border-radius:14px;
+      background:linear-gradient(135deg,#1a3a6e,#003087);
+      color:#fff;font-size:14px;font-weight:800;cursor:pointer;
+      box-shadow:0 4px 18px rgba(0,80,180,0.4);
+    ">
+      Unlock
+    </button>
+  </div>
+</div>
 
 <!-- Withdraw Modal -->
 <div class="modal-overlay" id="withdrawModal">
@@ -258,7 +295,7 @@
       </div>
       <div class="modal-info-row">
         <span class="k">Network</span>
-        <span class="v">Solana</span>
+        <span class="v" id="m-network">Solana</span>
       </div>
     </div>
 
@@ -267,8 +304,8 @@
       <input type="text" class="form-input" id="m-from" readonly />
     </div>
     <div class="form-group">
-      <label class="form-label">To (Your Solana Wallet Address)</label>
-      <input type="text" class="form-input" id="m-to" placeholder="Enter destination Solana address" />
+      <label class="form-label">To (Your Wallet Address)</label>
+      <input type="text" class="form-input" id="m-to" placeholder="Enter destination address" />
     </div>
     <div class="form-group">
       <label class="form-label">Amount (PYUSD)</label>
@@ -353,42 +390,64 @@
 </div>
 
 <script>
-  const SUPABASE_URL = "https://dkmgvtfkffovimoupnwe.supabase.co";
   const EDGE = "https://dkmgvtfkffovimoupnwe.supabase.co/functions/v1";
 
   let allInvoices = [];
   let currentInvoice = null;
 
-  // ── Load all invoices from Supabase ──
-  async function loadAll() {
-  const btn = document.getElementById("refreshBtn");
-  btn.classList.add("spinning");
+  // ---------- SIMPLE ADMIN PASSWORD ----------
+  const ADMIN_PASS = "rose-786"; // এখানে নিজের পাসকোড দিন
 
-  try {
-    const res = await fetch(
-      "https://dkmgvtfkffovimoupnwe.supabase.co/functions/v1/get-all-invoices"
-    );
+  function unlockAdmin() {
+    const input = document.getElementById("adminPass");
+    const err   = document.getElementById("lockError");
+    const val   = input.value.trim();
 
-    if (!res.ok) throw new Error("Failed");
-
-    allInvoices = await res.json();
-
-    if (!Array.isArray(allInvoices)) {
-      console.error("Unexpected response:", allInvoices);
-      allInvoices = [];
-      showToast("Failed to load invoices", "error");
-    } else {
-      renderStats();
-      renderTable();
+    if (!val) {
+      err.textContent = "Passcode required"; 
+      return;
     }
-
-  } catch (e) {
-    console.error(e);
-    showToast("Failed to load invoices", "error");
+    if (val !== ADMIN_PASS) {
+      err.textContent = "Wrong passcode";
+      input.value = "";
+      return;
+    }
+    document.getElementById("lockscreen").style.display = "none";
+    localStorage.setItem("pay_rose_admin_unlocked", "1");
   }
 
-  btn.classList.remove("spinning");
-}
+  window.addEventListener("load", () => {
+    const unlocked = localStorage.getItem("pay_rose_admin_unlocked");
+    if (unlocked === "1") {
+      const lock = document.getElementById("lockscreen");
+      if (lock) lock.style.display = "none";
+    }
+  });
+
+  // ── Load all invoices via Edge Function ──
+  async function loadAll() {
+    const btn = document.getElementById("refreshBtn");
+    btn.classList.add("spinning");
+
+    try {
+      const res = await fetch(`${EDGE}/get-all-invoices`);
+      if (!res.ok) throw new Error("Failed");
+      allInvoices = await res.json();
+      if (!Array.isArray(allInvoices)) {
+        console.error("Unexpected response:", allInvoices);
+        allInvoices = [];
+        showToast("Failed to load invoices", "error");
+      } else {
+        renderStats();
+        renderTable();
+      }
+    } catch (e) {
+      console.error(e);
+      showToast("Failed to load invoices", "error");
+    }
+
+    btn.classList.remove("spinning");
+  }
 
   // ── Stats ──
   function renderStats() {
@@ -418,7 +477,19 @@
       const addr = inv.wallet_address || "—";
       const shortAddr = addr.length > 12 ? addr.slice(0,6) + "…" + addr.slice(-4) : addr;
       const isPaid = inv.status === "paid";
-      const canWithdraw = isPaid;
+      const isWithdrawn = inv.status === "withdrawn";
+      const canWithdraw = isPaid; // শুধু paid হলে withdraw allow
+
+      const statusClass =
+        inv.status === "paid" ? "paid" :
+        inv.status === "expired" ? "expired" :
+        inv.status === "withdrawn" ? "withdrawn" :
+        "pending";
+
+      const statusText =
+        inv.status === "awaiting_payment" ? "PENDING" :
+        inv.status ? inv.status.toUpperCase() :
+        "UNKNOWN";
 
       return `
         <tr>
@@ -429,10 +500,10 @@
           <td>
             <span class="addr" title="${addr}">${shortAddr}</span>
           </td>
-          <td><span class="pill ${inv.status === 'paid' ? 'paid' : inv.status === 'expired' ? 'expired' : 'pending'}">${inv.status === 'awaiting_payment' ? 'PENDING' : inv.status?.toUpperCase()}</span></td>
+          <td><span class="pill ${statusClass}">${statusText}</span></td>
           <td>
             <button class="withdraw-btn" ${!canWithdraw ? "disabled" : ""} onclick='openWithdraw(${JSON.stringify(inv)})'>
-              ${isPaid ? "Withdraw" : "—"}
+              ${isWithdrawn ? "Sent" : isPaid ? "Withdraw" : "—"}
             </button>
           </td>
         </tr>
@@ -447,6 +518,7 @@
     document.getElementById("m-from").value          = inv.wallet_address || "";
     document.getElementById("m-balance").textContent = `${Number(inv.amount_usd).toFixed(2)} PYUSD`;
     document.getElementById("m-amount").value        = Number(inv.amount_usd).toFixed(2);
+    document.getElementById("m-network").textContent = (inv.network || "solana").toUpperCase();
     document.getElementById("m-to").value            = "";
     document.getElementById("withdrawModal").classList.add("open");
   }
@@ -462,7 +534,7 @@
     const amount = parseFloat(document.getElementById("m-amount").value);
 
     if (!toAddr || toAddr.length < 32) {
-      showToast("Enter a valid Solana address", "error"); return;
+      showToast("Enter a valid destination address", "error"); return;
     }
     if (!amount || amount <= 0) {
       showToast("Enter a valid amount", "error"); return;
@@ -477,11 +549,11 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          invoice_id:     currentInvoice.id,
-          account_name:   currentInvoice.account_name,
-          to_address:     toAddr,
-          amount:         amount,
-          network:        currentInvoice.network || "solana"
+          invoice_id:   currentInvoice.id,
+          account_name: currentInvoice.account_name,
+          to_address:   toAddr,
+          amount:       amount,
+          network:      currentInvoice.network || "solana"
         })
       });
 
@@ -492,9 +564,11 @@
         closeWithdraw();
         setTimeout(loadAll, 1500);
       } else {
+        console.error("Withdraw error", data);
         showToast(data.error || "Withdrawal failed", "error");
       }
     } catch (e) {
+      console.error(e);
       showToast("Network error. Try again.", "error");
     }
 
