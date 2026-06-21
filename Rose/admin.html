@@ -354,7 +354,6 @@
 
 <script>
   const SUPABASE_URL = "https://dkmgvtfkffovimoupnwe.supabase.co";
-  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRrbWd2dGZrZmZvdmltb3VwbndlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI2NjM2NjgsImV4cCI6MjA1ODIzOTY2OH0.b5sB6hCMCbPYS1JkRYWB0-VXIiuSjdMGPOdpMNa1HJY";
   const EDGE = "https://dkmgvtfkffovimoupnwe.supabase.co/functions/v1";
 
   let allInvoices = [];
@@ -362,28 +361,34 @@
 
   // ── Load all invoices from Supabase ──
   async function loadAll() {
-    const btn = document.getElementById("refreshBtn");
-    btn.classList.add("spinning");
+  const btn = document.getElementById("refreshBtn");
+  btn.classList.add("spinning");
 
-    try {
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/invoices?select=*&order=created_at.desc`,
-        {
-          headers: {
-            "apikey": SUPABASE_ANON,
-            "Authorization": `Bearer ${SUPABASE_ANON}`
-          }
-        }
-      );
-      allInvoices = await res.json();
+  try {
+    const res = await fetch(
+      "https://dkmgvtfkffovimoupnwe.supabase.co/functions/v1/get-all-invoices"
+    );
+
+    if (!res.ok) throw new Error("Failed");
+
+    allInvoices = await res.json();
+
+    if (!Array.isArray(allInvoices)) {
+      console.error("Unexpected response:", allInvoices);
+      allInvoices = [];
+      showToast("Failed to load invoices", "error");
+    } else {
       renderStats();
       renderTable();
-    } catch (e) {
-      showToast("Failed to load invoices", "error");
     }
 
-    btn.classList.remove("spinning");
+  } catch (e) {
+    console.error(e);
+    showToast("Failed to load invoices", "error");
   }
+
+  btn.classList.remove("spinning");
+}
 
   // ── Stats ──
   function renderStats() {
