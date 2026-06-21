@@ -526,7 +526,7 @@
             });
             const d = await r.json();
             const id = d.invoice_id || d.id;
-            if (id) window.location.href = `invoice.html?id=${id}`;
+            if (id) window.location.href = `invoice.html?id=${id}&via=${via === "PayPal" ? "paypal" : "venmo"}`;
         } catch {
             alert("Something went wrong. Please try again.");
             btn.classList.remove("loading");
