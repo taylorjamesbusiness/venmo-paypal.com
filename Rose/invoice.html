@@ -271,10 +271,14 @@
     .send-btn-sub {
       font-size: 11px; color: #5BA4F5; font-weight: 600; line-height: 1.4;
     }
-    .send-btn-sub .strikethrough {
-      text-decoration: line-through; color: #445; text-decoration-color: #ef4444;
-      text-decoration-thickness: 1.5px;
-    }
+    .send-btn-sub .dim-text {
+  color: #334;
+  font-weight: 600;
+}
+.send-btn-sub .bright-text {
+  color: #5BA4F5;
+  font-weight: 700;
+}
     .send-btn-arrow {
       display: flex; align-items: center; padding-right: 14px;
       color: #446; font-size: 16px;
@@ -598,26 +602,28 @@
     <!-- Single Send Button -->
     <div class="send-btn-wrap">
       <button class="send-btn" id="btn-send" onclick="goToPayment()">
-        <div class="send-btn-icon">
-          <div class="send-arrow-circle">
-            <svg width="18" height="18" viewBox="0 0 60 60" fill="none">
-              <path d="M10 22h34M36 14l8 8-8 8" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M50 38H16M24 30l-8 8 8 8" stroke="rgba(255,255,255,0.55)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-        </div>
-        <div class="send-btn-body">
-          <div class="send-btn-title">Send PYUSD</div>
-          <div class="send-btn-sub">
-            <span class="strikethrough">To a PayPal customer</span> or an external address
-          </div>
-        </div>
-        <div class="send-btn-arrow">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-      </button>
+  <div class="send-btn-icon">
+    <div class="send-arrow-circle">
+      <!-- PayPal-style send / paper-plane icon -->
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M22 2L11 13" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+  <div class="send-btn-body">
+    <div class="send-btn-title">Send PYUSD</div>
+    <div class="send-btn-sub">
+      <span class="dim-text">To a PayPal customer</span>
+      <span class="bright-text"> or an external address</span>
+    </div>
+  </div>
+  <div class="send-btn-arrow">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</button>
     </div>
 
   </div><!-- /content -->
