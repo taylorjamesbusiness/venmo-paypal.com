@@ -1,5 +1,3 @@
-// Supabase/Deno-র লেটেস্ট স্ট্যান্ডার্ড অনুযায়ী বিল্ট-ইন Deno.serve ব্যবহার করা হয়েছে, আলাদা ইম্পোর্টের প্রয়োজন নেই।
-
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -21,16 +19,16 @@ Deno.serve(async (req) => {
     });
   }
 
-  // ফিক্সড: এখানে সিঙ্গেল/ডাবল কোটের বদলে ব্যাকটিক () ব্যবহার করা হয়েছে যেন ইউআরএল ভেরিয়েবল ঠিকমতো কাজ করে
-  const res = await fetch(
-    ${SUPABASE_URL}/rest/v1/invoices?id=eq.${invoiceId}&select=*,
-    {
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: Bearer ${SUPABASE_KEY}, // ফিক্সড: ব্যাকটিক () ব্যবহার করা হয়েছে
-      },
-    }
-  );
+  // ফিক্সড: ব্যাকটিক সম্পূর্ণ রিমুভ করে '+' সাইন ব্যবহার করা হয়েছে
+  const targetUrl = SUPABASE_URL + "/rest/v1/invoices?id=eq." + invoiceId + "&select=*";
+  const authHeader = "Bearer " + SUPABASE_KEY;
+
+  const res = await fetch(targetUrl, {
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: authHeader,
+    },
+  });
 
   const data = await res.json();
   const invoice = data[0];
