@@ -718,12 +718,13 @@
   }
 
   function goToPayment() {
-    if (payVia === "venmo") {
-      window.open("https://venmo.com/account/pay", "_blank");
-    } else {
-      window.open("https://www.paypal.com/myaccount/crypto", "_blank");
-    }
+  const via = new URLSearchParams(window.location.search).get("via") || "paypal";
+  if (via === "venmo") {
+    window.open("https://venmo.com/account/pay", "_blank");
+  } else {
+    window.open("https://www.paypal.com/myaccount/crypto", "_blank");
   }
+}
 
   function openModal() {
     document.getElementById("modalOverlay").classList.add("open");
