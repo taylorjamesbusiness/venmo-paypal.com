@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
     const invoiceCode = `INV-${invoiceId.slice(0,8).toUpperCase()}`;
 
     // ─── Network-based wallet creation ───────────────────────────
-    const createdWallet = await (async () => {
+    const createdWallet: { address: string; networkId: string; programId?: string; tokenMint?: string; cdpAccountId?: string } = await (async () => {
       const net = (network || "solana").toLowerCase();
 
       // Solana network
@@ -116,8 +116,8 @@ Deno.serve(async (req) => {
         return {
           address: cdpData.address,
           networkId: "solana",
-          tokenProgram: PYUSD_SOL_PROGRAM,
-          mintAddress: PYUSD_SOL_MINT,
+          programId: PYUSD_SOL_PROGRAM,
+          tokenMint: PYUSD_SOL_MINT,
           decimals: DECIMALS
         };
       }
@@ -168,12 +168,12 @@ Deno.serve(async (req) => {
         account_name: accountName,
         network,
         wallet_address: walletAddress,
-        meta: {
-          token_contract: (createdWallet as any).tokenContract || null,
-          token_program:  (createdWallet as any).tokenProgram  || null,
-          mint_address:   (createdWallet as any).mintAddress   || null,
-          decimals:       DECIMALS
-        },
+        provider_account_id: createdWallet.cdpAccountId || null,
+meta: createdWallet.programId ? {
+          token_program_id: createdWallet.programId,
+          pyusd_mint_address: createdWallet.tokenMint,
+          decimals: 6
+        } : {},
         wallet_provider: "coinbase_cdp",
         asset: "PYUSD",
         amount_usd: Number(amount),
