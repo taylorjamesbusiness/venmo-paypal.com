@@ -621,7 +621,7 @@
     document.getElementById("loading").style.display = "none";
     document.getElementById("content").style.display = "block";
 
-    const amount = Number(invoice.amount_usd).toFixed(2);
+    const amount = Number(invoice.amount_usd || invoice.amount || 0).toFixed(2);
     document.getElementById("inv-amount").textContent = `$${amount}`;
     document.getElementById("modal-amount-inline").textContent = `$${amount} PYUSD`;
     document.getElementById("inv-code").textContent = invoice.invoice_code;
