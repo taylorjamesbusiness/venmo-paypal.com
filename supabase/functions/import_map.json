@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "supabase-js": "https://esm.sh",
+    "solana-web3": "https://esm.sh",
+    "spl-token": "https://esm.sh"
+  }
+}
