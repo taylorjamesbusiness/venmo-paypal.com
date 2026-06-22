@@ -265,14 +265,8 @@
     .send-btn-sub {
       font-size: 11px; color: #5BA4F5; font-weight: 600; line-height: 1.4;
     }
-    .send-btn-sub .dim-text {
-      color: #334;
-      font-weight: 600;
-    }
-    .send-btn-sub .bright-text {
-      color: #5BA4F5;
-      font-weight: 700;
-    }
+    .send-btn-sub .dim-text { color: #334; font-weight: 600; }
+    .send-btn-sub .bright-text { color: #5BA4F5; font-weight: 700; }
     .send-btn-arrow {
       display: flex; align-items: center; padding-right: 14px;
       color: #446; font-size: 16px;
@@ -280,7 +274,7 @@
 
     .loading { text-align: center; padding: 80px 20px; color: #444; font-size: 14px; }
 
-    /* ── HOW TO PAY MODAL (আগের মত, শুধু image URLs সহ) ── */
+    /* ── HOW TO PAY MODAL ── */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.88);
       display: flex; align-items: flex-end; justify-content: center;
@@ -381,7 +375,6 @@
 
     <div class="modal-body">
 
-      <!-- Step 1 -->
       <div class="step">
         <div class="step-left">
           <div class="step-num">1</div>
@@ -397,7 +390,6 @@
 
       <div class="step-connector"></div>
 
-      <!-- Step 2 -->
       <div class="step">
         <div class="step-left">
           <div class="step-num">2</div>
@@ -413,7 +405,6 @@
 
       <div class="step-connector"></div>
 
-      <!-- Step 3 -->
       <div class="step">
         <div class="step-left">
           <div class="step-num">3</div>
@@ -429,7 +420,6 @@
 
       <div class="step-connector"></div>
 
-      <!-- Step 4 -->
       <div class="step">
         <div class="step-left">
           <div class="step-num">4</div>
@@ -445,7 +435,6 @@
 
       <div class="step-connector"></div>
 
-      <!-- Step 5 -->
       <div class="step">
         <div class="step-left">
           <div class="step-num">5</div>
@@ -461,7 +450,6 @@
 
       <div class="step-connector"></div>
 
-      <!-- Step 6 -->
       <div class="step">
         <div class="step-left">
           <div class="step-num">6</div>
@@ -475,7 +463,7 @@
         </div>
       </div>
 
-    </div><!-- /modal-body -->
+    </div>
 
     <button class="modal-close" onclick="closeModal()">Got it ✓</button>
   </div>
@@ -587,20 +575,20 @@
       </button>
     </div>
 
-  </div><!-- /content -->
-</div><!-- /container -->
+  </div>
+</div>
 
 <script>
   const EDGE_URL  = "https://dkmgvtfkffovimoupnwe.supabase.co/functions/v1";
   const CHECK_API = EDGE_URL + "/check-payment";
 
-  let invoice = null;
+  let invoice      = null;
   let timerInterval = null;
   let payCheckTimer = null;
 
   const params    = new URLSearchParams(window.location.search);
   const invoiceId = params.get("id");
-  const payVia    = params.get("via") || "paypal"; // invoice কে কোন app থেকে খুলেছে
+  const payVia    = params.get("via") || "paypal";
 
   async function loadInvoice() {
     if (!invoiceId) {
@@ -641,16 +629,13 @@
       });
     }
 
-    // যদি already paid হয়
     if (invoice.status === "paid") {
       setPaidUI();
     }
 
     startTimer();
-
-    // Auto payment check
-    pollPaymentStatus();                      // first call
-    payCheckTimer = setInterval(pollPaymentStatus, 30000); // every 30s
+    pollPaymentStatus();
+    payCheckTimer = setInterval(pollPaymentStatus, 30000);
   }
 
   function startTimer() {
@@ -686,6 +671,11 @@
     statusEl.style.color      = "#14F195";
 
     document.getElementById("expired-banner").style.display = "none";
+
+    // ✅ Timer ও polling বন্ধ করো
+    if (timerInterval) clearInterval(timerInterval);
+    if (payCheckTimer) clearInterval(payCheckTimer);
+
     const cd = document.getElementById("countdown");
     cd.classList.remove("urgent");
     cd.style.color = "#14F195";
